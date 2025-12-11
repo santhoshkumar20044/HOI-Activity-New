@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Menu Requisition Form</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-color: #006d77; /* Teal Blue */
+            --secondary-color: #eefcfd;
+            --text-dark: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --danger: #d32f2f; 
+            --warning-bg: #ffc107;
+            --grey-btn: #78909c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER STYLES --- */
+        .custom-header {
+            background-color: #ffffff;
+            border-bottom: 8px solid #005f63; 
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-left-img { height: 55px; width: auto; object-fit: contain; }
+        .logo-right-img { height: 45px; width: auto; object-fit: contain; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* HOI Button */
+        .hoi-badge {
+            background-color: var(--warning-bg);
+            color: #212529;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .hoi-badge:hover { transform: scale(1.05); }
+        .hoi-icon { color: #dc3545; font-size: 16px; }
+
+        /* Back Button */
+        .btn-back {
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+        .btn-back:hover { background-color: #f8f9fa; border-color: #adb5bd; }
+
+        /* --- CONTAINER & CARD --- */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            padding: 30px 15px;
+        }
+
+        .card {
+            background: var(--white);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 26px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;
+        }
+
+        /* --- FORM STYLES --- */
+        .section-box {
+            background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin-bottom: 20px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .section-box:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .section-header {
+            display: flex; align-items: center; gap: 10px; color: var(--primary-color); font-weight: bold; margin-bottom: 20px; font-size: 16px; text-transform: uppercase;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 109, 119, 0.1);
+        }
+
+        /* Checkbox/Radio Groups */
+        .checkbox-group {
+            display: flex; flex-wrap: wrap; gap: 15px; padding: 10px 0;
+        }
+        .checkbox-item {
+            display: flex; align-items: center; gap: 8px; font-size: 14px; background: white; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px;
+        }
+
+        /* Menu Grid */
+        .menu-row {
+            display: grid; grid-template-columns: 2fr 1fr; gap: 15px; margin-bottom: 15px; align-items: end;
+        }
+
+        .submit-container { text-align: right; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 14px 40px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
+
+        /* --- MODAL STYLES --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 1000;
+            display: none; justify-content: center; align-items: center;
+        }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 8px;
+            width: 90%; max-width: 800px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative; animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .hoi-title { color: var(--danger); font-size: 24px; font-weight: 800; text-align: center; text-transform: uppercase; margin-bottom: 10px; }
+        .hoi-divider { height: 2px; background-color: var(--danger); margin: 20px 0; }
+        .hoi-footer { display: flex; gap: 15px; margin-top: 30px; justify-content: space-between; }
+        .btn-hoi-submit { background-color: var(--danger); color: white; border: none; padding: 12px 24px; font-weight: bold; border-radius: 4px; cursor: pointer; flex: 1; }
+        .btn-hoi-cancel { background-color: var(--grey-btn); color: white; border: none; padding: 12px 24px; font-weight: bold; border-radius: 4px; cursor: pointer; flex: 1; }
+
+        @media (max-width: 768px) {
+            .custom-header, .header-actions { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
+            .header-actions { width: 100%; }
+            .hoi-badge, .btn-back { width: 100%; justify-content: center; }
+            .grid-2, .grid-3, .menu-row { display: block; }
+            .menu-row input { margin-bottom: 10px; }
+            .card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="custom-header">
+        <img src="/public/clg-logo.png" alt="College Logo" class="logo-left-img" onerror="this.style.display='none'">
+
+        <div class="header-actions">
+            <div class="hoi-badge" onclick="openHOIModal()">
+                <i class="fas fa-exclamation-triangle hoi-icon"></i> 
+                HOI Intervention Needed
+            </div>
+            <a href="#" onclick="history.back()" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <img src="/public/aakam-logo.png" alt="Aakam Logo" class="logo-right-img" onerror="this.style.display='none'">
+        </div>
+    </header>
+
+    <div id="hoiModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 class="hoi-title">🚨 HOI IMMEDIATE INTERVENTION REQUIRED</h2>
+            <div class="hoi-divider"></div>
+            <p style="color: #d32f2f; font-weight: 500; margin-bottom: 20px;">
+                Use this form only for issues requiring <strong>immediate</strong> Head of Institution (HOI) action regarding food or guests.
+            </p>
+            <form>
+                <div class="form-group">
+                    <label>Brief Topic/Subject:</label>
+                    <input type="text" id="hoi_topic" placeholder="e.g., Food Poisoning Risk, VIP Guest Issue">
+                </div>
+                <div class="form-group">
+                    <label>Immediate Action Required:</label>
+                    <textarea id="hoi_details" rows="4" placeholder="Describe the emergency..."></textarea>
+                </div>
+                <div class="hoi-footer">
+                    <button type="button" class="btn-hoi-submit" onclick="submitHOI()">SUBMIT FOR REVIEW</button>
+                    <button type="button" class="btn-hoi-cancel" onclick="closeHOIModal()">← CANCEL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="card">
+            
+            <h1 class="main-title">FOOD MENU REQUISITION FORMAT</h1>
+
+            <form id="foodMenuForm">
+                
+                <div class="section-box" style="border-left: 4px solid var(--primary-color);">
+                    <div class="section-header"><i class="fas fa-university"></i> Institution & Requester Details</div>
+                    
+                    <div class="form-group">
+                        <label>Date of Request</label>
+                        <input type="date" id="req_date">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Institution Name (Tick Applicable)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="radio" name="institution" value="Engineering"> Engineering</label>
+                            <label class="checkbox-item"><input type="radio" name="institution" value="Pharmacy"> Pharmacy</label>
+                            <label class="checkbox-item"><input type="radio" name="institution" value="Nursing"> Nursing</label>
+                            <label class="checkbox-item"><input type="radio" name="institution" value="Allied"> Allied</label>
+                            <label class="checkbox-item"><input type="radio" name="institution" value="Hostel"> Hostel</label>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Internal Request By</label>
+                            <select id="internal_req">
+                                <option value="">-- Select --</option>
+                                <option value="Staffs">Staffs</option>
+                                <option value="Students">Students</option>
+                                <option value="Parents">Parents</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>External Request By</label>
+                            <select id="external_req">
+                                <option value="">-- Select --</option>
+                                <option value="Guest">Guest</option>
+                                <option value="Admission">Admission Related</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-box" style="border-left: 4px solid #f57c00;">
+                    <div class="section-header" style="color: #f57c00;"><i class="fas fa-users"></i> Guest & Visit Details</div>
+                    
+                    <div class="form-group">
+                        <label>Guest Names (List up to 5)</label>
+                        <div class="grid-2">
+                            <input type="text" placeholder="1. Name">
+                            <input type="text" placeholder="2. Name">
+                            <input type="text" placeholder="3. Name">
+                            <input type="text" placeholder="4. Name">
+                        </div>
+                        <input type="text" placeholder="5. Name" style="margin-top: 10px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Purpose of Visit</label>
+                        <input type="text" id="purpose" placeholder="Reason for food arrangement">
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>From Date</label>
+                            <input type="date" id="date_from">
+                        </div>
+                        <div class="form-group">
+                            <label>To Date</label>
+                            <input type="date" id="date_to">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-box" style="border-left: 4px solid #28a745;">
+                    <div class="section-header" style="color: #28a745;"><i class="fas fa-utensils"></i> Menu & Count Details</div>
+                    
+                    <div class="form-group">
+                        <div class="menu-row">
+                            <div>
+                                <label>Breakfast Menu</label>
+                                <input type="text" id="menu_breakfast" placeholder="e.g. Idli, Pongal">
+                            </div>
+                            <div>
+                                <label>Count</label>
+                                <input type="number" id="count_breakfast" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="menu-row">
+                            <div>
+                                <label>Morning Tea / Snacks</label>
+                                <input type="text" id="menu_m_tea" placeholder="e.g. Tea, Biscuits">
+                            </div>
+                            <div>
+                                <label>Count</label>
+                                <input type="number" id="count_m_tea" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="menu-row">
+                            <div>
+                                <label>Special Menu / Lunch</label>
+                                <textarea id="menu_lunch" rows="2" placeholder="Describe special lunch items..."></textarea>
+                            </div>
+                            <div>
+                                <label>Count</label>
+                                <input type="number" id="count_lunch" placeholder="0">
+                            </div>
+                        </div>
+
+                        <div class="menu-row">
+                            <div>
+                                <label>Afternoon Tea / Snacks</label>
+                                <input type="text" id="menu_a_tea" placeholder="e.g. Coffee, Bajji">
+                            </div>
+                            <div>
+                                <label>Count</label>
+                                <input type="number" id="count_a_tea" placeholder="0">
+                            </div>
+                        </div>
+
+                         <div class="menu-row">
+                            <div>
+                                <label>Evening / Dinner</label>
+                                <input type="text" id="menu_dinner" placeholder="e.g. Chapathi, Kurma">
+                            </div>
+                            <div>
+                                <label>Count</label>
+                                <input type="number" id="count_dinner" placeholder="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="button" class="btn-submit" onclick="submitFoodReport(event)">Submit Requisition</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // HOI Modal Logic
+        function openHOIModal() { document.getElementById('hoiModal').style.display = 'flex'; }
+        function closeHOIModal() { document.getElementById('hoiModal').style.display = 'none'; }
+        
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('hoiModal')) closeHOIModal();
+        }
+
+        // --- SUBMIT LOGIC ---
+        async function submitFoodReport(event) {
+            event.preventDefault();
+            
+            // Collect Data
+            const inst = document.querySelector('input[name="institution"]:checked')?.value || 'Not Selected';
+            const purpose = document.getElementById('purpose').value;
+            const fromDate = document.getElementById('date_from').value;
+            
+            // Menu Summary
+            const bf = document.getElementById('menu_breakfast').value;
+            const lunch = document.getElementById('menu_lunch').value;
+            
+            let desc = `Institution: ${inst}. Purpose: ${purpose}. Date: ${fromDate}. `;
+            if(bf) desc += `Breakfast: ${bf} (${document.getElementById('count_breakfast').value}). `;
+            if(lunch) desc += `Lunch: ${lunch} (${document.getElementById('count_lunch').value}).`;
+
+            // Payload
+            const payload = {
+                title: "Food Menu Requisition",
+                description: desc,
+                status: 'new',
+                timestamp: new Date()
+            };
+
+            console.log("Submitting:", payload);
+
+            // Send to Backend
+            try {
+                const response = await fetch('http://localhost:5000/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("✅ Food Menu Requisition Submitted Successfully!");
+                    window.location.reload(); 
+                } else {
+                    alert("✅ Simulation: Data Collected (Backend not connected)");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("✅ Simulation: Data Collected (Backend Error)");
+            }
+        }
+
+        function submitHOI() {
+            const topic = document.getElementById('hoi_topic').value;
+            if(!topic) { alert("Please enter a topic"); return; }
+            alert("🚨 HOI Intervention Alert Sent!");
+            closeHOIModal();
+        }
+    </script>
+
+</body>
+</html>

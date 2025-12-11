@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Research Report — Fixed Checkbox Alignment</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root{
+  --page-teal:#006d77;
+  --teal-dark:#0b6b6a;
+  --soft-bg:#f3f6f6;
+  --muted:#6b7280;
+  --card-bg:#ffffff;
+  --card-shadow:0 14px 40px rgba(3,15,15,0.12);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:"Segoe UI","Arial",sans-serif;
+  background:var(--page-teal);
+}
+
+/* header */
+.topbar{
+  background:#fff;
+  padding:14px 28px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 3px 10px rgba(0,0,0,0.06)
+}
+.brand-left img{height:56px}
+.brand-right{display:flex;align-items:center;gap:12px}
+.pill{
+  background:linear-gradient(180deg,#ffd966,#ffca28);
+  padding:8px 12px;
+  border-radius:999px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer
+}
+.back-btn{
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid #e6eef0;
+  background:white;
+  cursor:pointer
+}
+
+/* page */
+.page{padding:36px 18px}
+.card{
+  max-width:1100px;
+  margin:0 auto;
+  background:#fff;
+  border-radius:16px;
+  padding:36px;
+  box-shadow:var(--card-shadow)
+}
+
+.title{text-align:center;margin-bottom:8px}
+.title h1{margin:0;font-size:28px;color:var(--teal-dark);font-weight:900}
+
+/* tabs */
+.tabs{background:var(--soft-bg);padding:6px;border-radius:10px;display:flex;gap:8px;justify-content:center;margin:18px 0}
+.tab-btn{padding:10px 16px;border-radius:8px;border:0;background:transparent;color:var(--muted);font-weight:800;cursor:pointer}
+.tab-btn.active{background:var(--teal-dark);color:#fff;box-shadow:0 8px 20px rgba(3,15,15,0.12)}
+
+/* sections */
+.section{background:#fbfffe;border-radius:12px;padding:16px;border:1px solid #e6f1f1;margin-bottom:14px}
+.heading{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--teal-dark);margin-bottom:10px}
+.heading i{width:36px;height:36px;border-radius:8px;background:#e8f6f6;display:flex;align-items:center;justify-content:center}
+
+label{display:block;font-weight:700;color:#114;margin-bottom:6px}
+input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #e6eef0;background:#fff;font-size:14px}
+textarea{min-height:80px;resize:vertical}
+
+.grid{display:grid;gap:12px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:repeat(3,1fr)}
+
+/* ===== STRONG CHECKBOX ALIGN FIX =====
+   Uses explicit span for text, flex layout and protective rules.
+   This prevents labels from being treated like full-width blocks or wrapping into separate columns.
+*/
+.aligned-issues{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-top:6px;
+  width:100%;
+  /* ensure this container cannot be shrunk or stretched unexpectedly */
+  align-items:stretch;
+}
+
+.aligned-issues label{
+  display:flex !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:8px 6px;
+  background:transparent;
+  border-radius:8px;
+  cursor:pointer;
+  /* ensure label text does not get pushed away */
+  width:100% !important;
+  box-sizing:border-box !important;
+  white-space:normal !important;
+  text-align:left !important;
+}
+
+/* make checkbox fixed size, text area flexible */
+.aligned-issues label input[type="checkbox"]{
+  flex:0 0 auto !important;
+  width:18px !important;
+  height:18px !important;
+  transform:scale(1.15);
+  margin:0 !important;
+}
+
+/* place the text in a span and let it grow */
+.aligned-issues label span{
+  flex:1 1 auto;
+  display:inline-block;
+  line-height:1.25;
+  color:#0b3b36;
+  font-weight:700;
+}
+
+/* small responsive tweak */
+@media (max-width:560px){
+  .grid-2{grid-template-columns:1fr}
+  .grid-3{grid-template-columns:1fr}
+  .aligned-issues label{padding:8px 6px}
+}
+
+/* submit */
+.submit-area{display:flex;justify-content:flex-end;margin-top:12px;border-top:1px dashed #eaf6f6;padding-top:14px;gap:10px}
+.btn{padding:10px 18px;border-radius:10px;border:0;font-weight:900;cursor:pointer}
+.btn.primary{background:var(--teal-dark);color:#fff}
+.btn.secondary{background:#fff;border:1px solid #e6eef0;color:#123}
+
+/* popup */
+.overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:9999}
+.overlay .inner{background:#fff;border-radius:12px;padding:18px;width:680px;max-width:94%}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <div class="brand-left"><img src="clg logo.png" alt="" onerror="this.style.display='none'"></div>
+  <div class="brand-right">
+    <div class="pill" id="hoiPill"><i class="fas fa-bullhorn"></i> HOI Intervention</div>
+    <button class="back-btn" onclick="history.back()">← Back</button>
+    <img src="aakam.png" alt="" style="height:56px" onerror="this.style.display='none'">
+  </div>
+</header>
+
+<div class="page">
+  <div class="card">
+    <div class="title"><h1>RESEARCH REPORT</h1></div>
+
+    <div class="tabs">
+      <button id="tabWeekly" class="tab-btn active" onclick="switchTab('Weekly')">Weekly</button>
+      <button id="tabMonthly" class="tab-btn" onclick="switchTab('Monthly')">Monthly</button>
+    </div>
+
+    <h2 id="reportTitle" style="color:#0b6b6a;font-weight:900">Weekly Report</h2>
+
+    <form id="researchForm">
+
+      <!-- WEEKLY PANEL -->
+      <div id="panel-Weekly" class="panel">
+
+        <div class="section">
+          <div class="heading"><i class="fas fa-calendar-week"></i> FREQUENCY & ACTIVITY</div>
+          <div class="grid grid-2">
+            <div>
+              <label>Select Frequency</label>
+              <select id="freq_select"><option>Weekly</option><option>Monthly</option></select>
+            </div>
+            <div>
+              <label>Activity Type</label>
+              <select id="activity_type">
+                <option>IIC Events</option>
+                <option>Research Center Activity</option>
+                <option>Consulting Engagement</option>
+                <option>NPTEL / Certification</option>
+                <option>Others</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-3" style="margin-top:12px">
+            <div><label>No. of Exams</label><input id="count_exams" type="number" min="0"></div>
+            <div><label>No. of Consulting</label><input id="count_consult" type="number" min="0"></div>
+            <div><label>No. of Research Activities</label><input id="count_center" type="number" min="0"></div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Short Summary / Remarks</label>
+            <textarea id="weekly_remarks"></textarea>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="heading"><i class="fas fa-clipboard-check"></i> COMPLETION & IMPACT</div>
+          <div class="grid grid-2">
+            <div><label>Completion Status</label><select id="completion_status"><option>Completed</option><option>In Progress</option><option>Not Started</option></select></div>
+            <div><label>Quality & Output Impact</label><select id="quality_impact"><option>Excellent</option><option>Good</option><option>Average</option><option>Poor</option></select></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="heading"><i class="fas fa-exclamation-triangle"></i> ISSUES, BOTTLENECKS & CFB</div>
+
+          <!-- REPLACED: robust label+span structure -->
+          <div class="aligned-issues">
+            <label for="iss_low_fac"><input id="iss_low_fac" type="checkbox"><span>Low faculty participation</span></label>
+            <label for="iss_low_stu"><input id="iss_low_stu" type="checkbox"><span>Low student participation</span></label>
+            <label for="iss_delay_appr"><input id="iss_delay_appr" type="checkbox"><span>Delay in approvals</span></label>
+            <label for="iss_res"><input id="iss_res" type="checkbox"><span>Resource / equipment not available</span></label>
+            <label for="iss_external"><input id="iss_external" type="checkbox"><span>External body dependency (IIC / NPTEL / Companies)</span></label>
+            <label for="iss_facility"><input id="iss_facility" type="checkbox"><span>Research facility not ready</span></label>
+            <label for="iss_timeline"><input id="iss_timeline" type="checkbox"><span>Timeline slip</span></label>
+            <label for="iss_doc"><input id="iss_doc" type="checkbox"><span>Documentation pending</span></label>
+            <label for="iss_none"><input id="iss_none" type="checkbox"><span>No issues</span></label>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Other Issues (describe)</label>
+            <textarea id="issues_other"></textarea>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="heading"><i class="fas fa-chart-line"></i> KPI & RISK</div>
+          <div class="grid grid-2">
+            <div><label>KPI Status</label><select id="kpi_status"><option>Achieved</option><option>Partially Achieved</option><option>Not Achieved</option></select></div>
+          </div>
+
+          <div class="grid grid-2" style="margin-top:12px">
+            <div><label>No. of Companies Inside Campus</label><input id="comp_inside" type="number" min="0"></div>
+            <div><label>No. of Faculty & Student Projects</label><input id="proj_count" type="number" min="0"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MONTHLY PANEL -->
+      <div id="panel-Monthly" class="panel" style="display:none">
+        <div class="section">
+          <div class="heading"><i class="fas fa-calendar-alt"></i> MONTHLY SUMMARY</div>
+          <div class="grid grid-2">
+            <div><label>Monthly Research Highlights</label><textarea id="monthly_highlights"></textarea></div>
+            <div><label>Consulting Summary</label><textarea id="monthly_consult"></textarea></div>
+          </div>
+
+          <div class="grid grid-2" style="margin-top:12px">
+            <div><label>Quality & Output Impact (monthly)</label><select id="monthly_quality"><option>Excellent</option><option>Good</option><option>Average</option><option>Poor</option></select></div>
+            <div><label>Monthly Remarks</label><textarea id="monthly_remarks"></textarea></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit-area">
+        <button type="button" class="btn primary" onclick="submitResearch()">Submit Report</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- HOI POPUP -->
+<div id="overlay" class="overlay">
+  <div class="inner">
+    <h3 style="margin:0 0 8px;color:#b20000;font-weight:900">🚨 HOI IMMEDIATE INTERVENTION REQUIRED</h3>
+    <label>Topic</label>
+    <input id="hoi_topic" type="text">
+    <label style="margin-top:10px">Immediate Action Required</label>
+    <textarea id="hoi_details" rows="5"></textarea>
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+      <button class="btn secondary" onclick="closeIntervention()">Cancel</button>
+      <button class="btn primary" onclick="submitIntervention()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* Tabs */
+const panels = ['Weekly','Monthly'];
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab'+name).classList.add('active');
+  document.getElementById('reportTitle').textContent = name + " Report";
+  panels.forEach(p=>document.getElementById('panel-'+p).style.display = (p===name?'block':'none'));
+}
+switchTab('Weekly');
+
+/* HOI popup */
+document.getElementById('hoiPill').addEventListener('click', ()=> document.getElementById('overlay').style.display='flex');
+function closeIntervention(){ document.getElementById('overlay').style.display='none'; document.getElementById('hoi_topic').value=''; document.getElementById('hoi_details').value=''; }
+function submitIntervention(){ alert('HOI Submitted (mock)'); closeIntervention(); }
+
+/* collect checked */
+function collectChecked(ids){
+  return ids.map(id=>{
+    const el=document.getElementById(id);
+    return el && el.checked ? el.nextElementSibling ? el.nextElementSibling.textContent.trim() : id : null;
+  }).filter(Boolean);
+}
+
+/* submit */
+function submitResearch(){
+  const v=id=>(document.getElementById(id)?document.getElementById(id).value:null);
+  const payload={
+    submitted_at:new Date().toISOString(),
+    Frequency:v('freq_select'),
+    Activity_Type:v('activity_type'),
+    Counts:{exams:v('count_exams'),consult:v('count_consult'),center:v('count_center')},
+    Weekly:{remarks:v('weekly_remarks'),completion:v('completion_status'),quality:v('quality_impact')},
+    Issues:{list:collectChecked(['iss_low_fac','iss_low_stu','iss_delay_appr','iss_res','iss_external','iss_facility','iss_timeline','iss_doc','iss_none']),other:v('issues_other')},
+    KPI:{status:v('kpi_status'),risk:v('risk_level'),companies:v('comp_inside'),projects:v('proj_count')},
+    Monthly:{highlights:v('monthly_highlights'),consult:v('monthly_consult'),quality:v('monthly_quality'),remarks:v('monthly_remarks')}
+  };
+  console.log('RESEARCH PAYLOAD:',payload);
+  alert('✔ Research Report Submitted (mock)');
+}
+</script>
+</body>
+</html>

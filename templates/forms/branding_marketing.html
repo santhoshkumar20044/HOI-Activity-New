@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branding & Marketing Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- THEME & COLORS --- */
+        :root {
+            --primary-color: #006d77; /* Teal Blue */
+            --secondary-color: #eefcfd;
+            --text-dark: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER STYLES --- */
+        header {
+            background: #ffffff;
+            border-bottom: 4px solid #004d55;
+            padding: 15px 5%; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            flex-wrap: wrap; 
+            gap: 15px;
+        }
+
+        .logo-left { height: 60px; width: auto; object-fit: contain; }
+        .logo-right { height: 80px; width: auto; object-fit: contain; }
+        .header-right-group { display: flex; align-items: center; gap: 15px; }
+
+        .header-buttons { display: flex; align-items: center; gap: 10px; }
+
+        .intervention-btn {
+            padding: 8px 16px; border-radius: 999px; border: 1px solid #ff9800; background: #ffc107; color: #3e2723; 
+            font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
+        }
+        .intervention-btn:hover { background: #ffb300; transform: translateY(-1px); }
+
+        .back-btn {
+            padding: 8px 16px; border-radius: 999px; border: 1px solid #e5e7eb; background: #ffffff; color: #111827; 
+            font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 5px;
+        }
+        .back-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+
+        /* --- MAIN LAYOUT --- */
+        .main-container {
+            display: flex; justify-content: center; padding: 40px 15px;
+        }
+
+        .card {
+            background: var(--white); width: 100%; max-width: 700px; border-radius: 12px; 
+            box-shadow: var(--shadow); padding: 40px; box-sizing: border-box; animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hidden { display: none; }
+
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 26px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;
+        }
+        
+        #intervention-page .main-title { color: #d32f2f; border-bottom-color: #d32f2f; }
+
+        /* --- TABS SYSTEM --- */
+        .tabs-container {
+            display: flex; justify-content: center; background-color: #f3f4f6; padding: 5px; border-radius: 8px; margin-bottom: 30px;
+            width: fit-content; margin-left: auto; margin-right: auto;
+        }
+
+        .tab-btn {
+            padding: 10px 30px; border: none; background: transparent; font-size: 15px; font-weight: 600; color: #6b7280;
+            cursor: pointer; border-radius: 6px; transition: all 0.3s ease;
+        }
+
+        .tab-btn.active { background-color: var(--primary-color); color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .tab-btn:hover:not(.active) { background-color: #e5e7eb; color: #374151; }
+
+        /* --- FORM ELEMENTS --- */
+        .form-section { display: flex; flex-direction: column; gap: 25px; }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        
+        .form-group label { font-weight: 700; font-size: 15px; color: #374151; display: flex; align-items: center; gap: 8px; }
+        .form-group label i { color: var(--primary-color); }
+
+        .form-group select, .form-group textarea, .form-group input[type="text"] {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; font-family: inherit; background-color: #f9fafb;
+            box-sizing: border-box;
+        }
+        .form-group select:focus, .form-group textarea:focus, .form-group input:focus {
+            outline: none; border-color: var(--primary-color); background-color: #fff;
+        }
+
+        /* File Upload */
+        .file-upload-wrapper {
+            position: relative; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 30px;
+            border: 2px dashed #cbd5e1; background-color: #f8fafc; cursor: pointer;
+        }
+        .file-upload-wrapper input[type="file"] { position: absolute; left: 0; top: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        .file-name-display { margin-top: 10px; color: var(--primary-color); font-weight: bold; font-size: 14px; display: none; }
+
+        /* --- BUTTONS --- */
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 12px 40px; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: bold; cursor: pointer; width: auto; display: block; margin: 20px auto 0 auto; text-transform: uppercase;
+            transition: transform 0.1s, background-color 0.2s;
+        }
+        .btn-submit:hover { background-color: #005861; }
+        .btn-submit:active { transform: scale(0.98); }
+        
+        .button-group-hoi { display: flex; gap: 15px; margin-top: 20px; }
+        .submit-btn-hoi { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; }
+        .submit-btn-hoi.red { background-color: #d32f2f; }
+        .submit-btn-hoi.grey { background-color: #78909c; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; padding: 15px; }
+            .header-buttons { width: 100%; justify-content: center; }
+            .card { padding: 25px; }
+            .btn-submit { width: 100%; } 
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-section">
+            <img src="/public/clg-logo.png" alt="Logo Left" class="logo-left" onerror="this.style.display='none'">
+        </div>
+        
+        <div class="header-right-group">
+            <div class="header-buttons">
+                <button type="button" class="intervention-btn" onclick="openInterventionPage()">
+                    🚨 HOI Intervention Needed
+                </button>
+                <button type="button" class="back-btn" onclick="history.back()">
+                    ← Back
+                </button>
+            </div>
+            <img src="/public/aakam-logo.png" alt="Logo Right" class="logo-right" onerror="this.style.display='none'">
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="report-page" class="card">
+            <h1 class="main-title">
+                <i class="fas fa-bullhorn" style="margin-right: 10px;"></i> 
+                Branding & Marketing
+            </h1>
+
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('Daily')">Daily</button>
+                <button class="tab-btn" onclick="switchTab('Weekly')">Weekly</button>
+                <button class="tab-btn" onclick="switchTab('Monthly')">Monthly</button>
+            </div>
+
+            <form onsubmit="submitForm(event)" class="form-section">
+                
+                <div id="Daily-section">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-day"></i> Daily Activity Update</label>
+                        <textarea id="daily_activity" rows="4" placeholder="Briefly describe today's branding activities..."></textarea>
+                    </div>
+                </div>
+
+                <div id="Weekly-section" class="hidden">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-week"></i> Weekly Summary</label>
+                        <textarea id="weekly_summary" rows="4" placeholder="Key highlights of this week..."></textarea>
+                    </div>
+                </div>
+
+                <div id="Monthly-section" class="hidden">
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar-alt"></i> Monthly Overview</label>
+                        <textarea id="monthly_overview" rows="4" placeholder="Overall performance and metrics for the month..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-file-upload"></i> Upload Supporting Document / Report</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="reportFile" name="reportFile" onchange="showFileName()">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 32px; color: #94a3b8; margin-bottom: 10px;"></i>
+                        <span class="upload-text" style="color:#64748b; font-weight:600;">Click or Drag files to upload</span>
+                        <div id="fileName" class="file-name-display"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="remarks"><i class="fas fa-comment-dots"></i> Remarks</label>
+                    <textarea id="remarks" name="remarks" rows="2" placeholder="Any additional comments..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    Submit Report <i class="fas fa-paper-plane" style="margin-left: 8px;"></i>
+                </button>
+            </form>
+        </div>
+
+        <div id="intervention-page" class="card hidden">
+            <h1 class="main-title">🚨 HOI INTERVENTION REQUIRED</h1>
+            
+            <p style="color: #d32f2f; font-weight: 600; margin-bottom: 25px; text-align: center;">
+                Use this form only for critical Branding/Marketing issues requiring immediate HOI attention.
+            </p>
+
+            <form onsubmit="submitIntervention(event)">
+                <div class="form-group">
+                    <label>Brief Topic/Subject:</label>
+                    <input type="text" placeholder="e.g., Budget Approval Delayed, Social Media Crisis" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Immediate Action Required:</label>
+                    <textarea rows="5" placeholder="Describe the issue and the intervention needed..." required></textarea>
+                </div>
+
+                <div class="button-group-hoi">
+                    <button type="submit" class="submit-btn-hoi red">SUBMIT TO HOI</button>
+                    <button type="button" class="submit-btn-hoi grey" onclick="showReportPage()">← CANCEL</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        function openInterventionPage() {
+            document.getElementById('report-page').classList.add('hidden');
+            document.getElementById('intervention-page').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function showReportPage() {
+            document.getElementById('intervention-page').classList.add('hidden');
+            document.getElementById('report-page').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function showFileName() {
+            const fileInput = document.getElementById('reportFile');
+            const fileNameDisplay = document.getElementById('fileName');
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.textContent = "Selected: " + fileInput.files[0].name;
+                fileNameDisplay.style.display = 'block';
+                document.querySelector('.upload-text').style.display = 'none';
+            }
+        }
+
+        // --- TAB SWITCHING LOGIC ---
+        function switchTab(frequency) {
+            // Update Buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                if(btn.innerText === frequency) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // Hide all sections
+            document.getElementById('Daily-section').classList.add('hidden');
+            document.getElementById('Weekly-section').classList.add('hidden');
+            document.getElementById('Monthly-section').classList.add('hidden');
+
+            // Show selected
+            document.getElementById(frequency + '-section').classList.remove('hidden');
+        }
+
+        // --- BACKEND CONNECTION LOGIC ---
+        async function submitForm(e) {
+            e.preventDefault();
+            
+            // 1. Identify Frequency
+            const activeTab = document.querySelector('.tab-btn.active').innerText;
+            
+            // 2. Collect Data
+            const remarks = document.getElementById('remarks').value;
+            const fileInput = document.getElementById('reportFile');
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "No file uploaded";
+            
+            // Get Specific Content based on Tab
+            let specificContent = "";
+            if(activeTab === 'Daily') specificContent = document.getElementById('daily_activity').value;
+            else if(activeTab === 'Weekly') specificContent = document.getElementById('weekly_summary').value;
+            else specificContent = document.getElementById('monthly_overview').value;
+
+            // 3. Create Description
+            const description = `Frequency: ${activeTab}. Content: ${specificContent}. File: ${fileName}. Remarks: ${remarks || 'None'}.`;
+
+            // 4. Payload
+            const payload = {
+                title: "Branding & Marketing Report",
+                description: description,
+                status: 'new',
+                timestamp: new Date()
+            };
+
+            console.log("Submitting:", payload);
+
+            // 5. Send to Server
+            try {
+                const response = await fetch('http://localhost:5000/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert(`✅ ${activeTab} Branding Report Submitted Successfully!`);
+                    window.location.reload(); 
+                } else {
+                    alert("❌ Failed to submit report.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("❌ Server Error: Is backend running?");
+            }
+        }
+
+        function submitIntervention(e) {
+            e.preventDefault();
+            alert("🚨 HOI Intervention Request Sent!");
+            showReportPage();
+        }
+    </script>
+
+</body>
+</html>

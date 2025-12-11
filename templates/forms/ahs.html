@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>AHS REPORT — Daily</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --page-teal:#006d77;
+      --teal-dark:#0b6b6a;
+      --card-bg:#ffffff;
+      --soft-bg:#f3f6f6;
+      --muted:#6b7280;
+      --danger:#d32f2f;
+      --card-shadow:0 14px 40px rgba(3,15,15,0.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    body{background:var(--page-teal);color:#122}
+
+    .topbar{background:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 10px rgba(0,0,0,0.06)}
+    .brand-left img{height:56px}
+    .brand-right{display:flex;align-items:center;gap:12px}
+    .pill{background:linear-gradient(180deg,#ffd966,#ffca28);padding:8px 14px;border-radius:999px;font-weight:800;color:#5a3f00;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+    .back-btn{padding:8px 12px;border-radius:999px;border:1px solid #e6eef0;background:#fff;cursor:pointer}
+
+    .page{padding:40px 18px 80px}
+    .card{max-width:900px;margin:0 auto;background:var(--card-bg);border-radius:16px;padding:36px 40px;box-shadow:var(--card-shadow)}
+    .title{text-align:center;margin-bottom:8px}
+    .title h1{margin:0;font-size:28px;color:var(--teal-dark);font-weight:900;text-transform:uppercase}
+
+    .report-header{display:flex;align-items:center;gap:12px;margin:18px 0}
+    .report-header h2{margin:0;font-size:20px;font-weight:800;color:#123;padding-left:12px;border-left:6px solid var(--teal-dark)}
+
+    .section{background:#fbfffe;border-radius:12px;padding:18px;border:1px solid #e6f1f1;margin-bottom:16px}
+    .heading{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--teal-dark);margin-bottom:12px}
+    .heading i{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#e8f6f6;color:var(--teal-dark)}
+
+    .grid{display:grid;gap:12px}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
+    label{display:block;font-weight:700;color:#114;margin-bottom:6px}
+    input[type="text"], input[type="number"], select, textarea, input[type="date"]{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid #e6eef0; font-size:14px; background:#fff;
+    }
+    textarea{min-height:66px; resize:vertical}
+    .checkbox-group{display:flex;flex-direction:column;gap:8px}
+    .checkbox-row{display:flex;align-items:center;gap:8px;font-weight:700;color:#234}
+    .submit-area{display:flex;justify-content:flex-end;margin-top:16px;border-top:1px dashed #eaf6f6;padding-top:18px;gap:10px}
+    .btn{padding:12px 22px;border-radius:10px;border:0;font-weight:900;cursor:pointer}
+    .btn.primary{background:var(--teal-dark);color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #e6eef0;color:#123}
+
+    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:9999}
+    .overlay .inner{background:#fff;border-radius:12px;padding:20px;width:720px;max-width:94%;box-shadow:0 30px 80px rgba(0,0,0,0.3)}
+    .overlay h3{margin:0;color:var(--danger)}
+
+    @media (max-width:960px){ .grid-2{grid-template-columns:1fr} .card{padding:24px} }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand-left">
+      <img src="/public/college logos/ahs-logo.svg" alt="College Logo" onerror="this.style.display='none'">
+    </div>
+
+    <div class="brand-right">
+      <div class="pill" id="hoiPill"><i class="fas fa-notes-medical" style="color:#bf5d00"></i> HOI Intervention</div>
+      <button class="back-btn" onclick="history.back()">← Back</button>
+      <img src="/public/aakam-logo.png" alt="Aakam 360" style="height:56px" onerror="this.style.display='none'">
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="card">
+      <div class="title"><h1>AHS REPORT</h1></div>
+
+      <div class="report-header">
+        <h2 id="reportTitle">Daily AHS Report</h2>
+      </div>
+
+      <form id="ahsForm" autocomplete="off">
+
+        <div class="section">
+          <div class="heading"><i class="fas fa-user-check"></i> ATTENDANCE & OPERATIONS</div>
+
+          <div class="grid grid-2">
+            <div>
+              <label>Attendance % (Biometric)</label>
+              <input id="ahs_attendance_pct" type="number" min="0" max="100" placeholder="e.g. 92">
+            </div>
+            <div>
+              <label>Student Complaints (if any)</label>
+              <textarea id="ahs_complaints" placeholder="Describe complaints"></textarea>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="margin-top:12px">
+            <div>
+              <label>Events Planned for Tomorrow</label>
+              <input id="ahs_events_tomorrow" type="text" placeholder="Event / activity">
+            </div>
+            <div>
+              <label>RO Water Availability</label>
+              <select id="ahs_ro_water"><option>Available</option><option>Not Available</option></select>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="margin-top:12px">
+            <div>
+              <label>Bore Water Availability</label>
+              <select id="ahs_bore_water"><option>Available</option><option>Not Available</option></select>
+            </div>
+            <div>
+              <label>Current Status of Today's Activity</label>
+              <select id="ahs_current_status"><option>Completed</option><option>Partially Completed</option><option>Not Completed</option></select>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Reason (If partially or not completed)</label>
+            <textarea id="ahs_not_completed_reason"></textarea>
+          </div>
+        </div>
+
+        <div class="section">
+            <div class="heading"><i class="fas fa-university"></i> ACADEMIC & ADMIN UPDATES</div>
+            
+            <div class="grid grid-2">
+                <div>
+                    <label>Clinical Posting Details</label>
+                    <input id="ahs_clinical_posting" type="text" placeholder="Hospital / Department details">
+                </div>
+            </div>
+
+            <div style="margin-top:12px">
+                <label>Communication for University / DME / INC / TNNMC</label>
+                <textarea id="ahs_communication" placeholder="Enter details of any correspondence sent or received..."></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+          <div class="heading"><i class="fas fa-exclamation-triangle"></i> ISSUES & ROOT CAUSES</div>
+
+          <p style="margin:0 0 8px 0;color:var(--muted);font-size:13px">Check all that apply</p>
+
+          <div class="grid grid-2">
+            <div>
+              <label style="font-weight:800;color:#333">Issues</label>
+              <div class="checkbox-group" style="margin-top:8px">
+                <label class="checkbox-row"><input id="iss_biometric" type="checkbox"> Biometric not working</label>
+                <label class="checkbox-row"><input id="iss_attendance_mismatch" type="checkbox"> Attendance mismatch / low attendance</label>
+                <label class="checkbox-row"><input id="iss_complaints_pending" type="checkbox"> Student complaints pending</label>
+                <label class="checkbox-row"><input id="iss_ro_unavail" type="checkbox"> RO water unavailable</label>
+                <label class="checkbox-row"><input id="iss_bore_unavail" type="checkbox"> Bore water unavailable</label>
+                <label class="checkbox-row"><input id="iss_hygiene" type="checkbox"> Hygiene / safety issue</label>
+                <label class="checkbox-row"><input id="iss_none" type="checkbox"> No issues</label>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Other Issues / Notes</label>
+            <textarea id="ahs_other_issues"></textarea>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="heading"><i class="fas fa-chart-line"></i> KPI & RISK</div>
+
+          <p style="margin:0 0 8px 0;color:var(--muted);font-size:13px">Check all that apply</p>
+
+          <div class="checkbox-group" style="margin-top:8px">
+            <label class="checkbox-row"><input id="kpi_attendance" type="checkbox"> Attendance data accurate</label>
+            <label class="checkbox-row"><input id="kpi_complaints" type="checkbox"> Complaints handled properly</label>
+            <label class="checkbox-row"><input id="kpi_eventplan" type="checkbox"> Event plan completed</label>
+            <label class="checkbox-row"><input id="kpi_water" type="checkbox"> Water supply stable</label>
+            <label class="checkbox-row"><input id="kpi_notach" type="checkbox"> KPI not achieved</label>
+          </div>
+        </div>
+
+        <div class="submit-area">
+          <button type="button" class="btn primary" onclick="submitAHS()">Submit Report</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="inner">
+      <h3>🚨 HOI IMMEDIATE INTERVENTION REQUIRED</h3>
+      <p>Use only for urgent AHS issues requiring HOI action.</p>
+
+      <div style="margin-top:12px">
+        <label>Topic</label>
+        <input id="hoi_topic" type="text">
+      </div>
+      <div style="margin-top:12px">
+        <label>Immediate Action Required</label>
+        <textarea id="hoi_details" rows="5"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+        <button class="btn secondary" onclick="closeIntervention()">Cancel</button>
+        <button class="btn primary" onclick="submitIntervention()">Submit to HOI</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* helper to collect checked labels */
+    function collectChecked(ids){
+      return ids.map(id=>{
+        const el = document.getElementById(id);
+        return el && el.checked ? el.parentElement.textContent.trim() : null;
+      }).filter(Boolean);
+    }
+    const val = id => document.getElementById(id) ? document.getElementById(id).value : '';
+
+    /* HOI popup */
+    function openIntervention(){ document.getElementById('overlay').style.display='flex'; document.getElementById('hoi_topic').focus(); }
+    function closeIntervention(){ document.getElementById('overlay').style.display='none'; document.getElementById('hoi_topic').value=''; document.getElementById('hoi_details').value=''; }
+    
+    function submitIntervention(){
+      const t = val('hoi_topic').trim(); 
+      const d = val('hoi_details').trim();
+      if(!t || !d){ alert('Please fill Topic and Details.'); return; }
+      
+      alert('🚨 HOI Intervention submitted successfully (mock)!');
+      closeIntervention();
+    }
+
+    /* FINAL SUBMIT - CONNECTED TO BACKEND */
+    async function submitAHS(){
+      
+      // 1. Data Collection
+      const attendance = val('ahs_attendance_pct');
+      const complaints = val('ahs_complaints') || "None";
+      const waterStatus = `RO: ${val('ahs_ro_water')}, Bore: ${val('ahs_bore_water')}`;
+      const status = val('ahs_current_status');
+      
+      // New Fields Added Here
+      const clinical = val('ahs_clinical_posting');
+      const communication = val('ahs_communication');
+      
+      const issues = collectChecked(['iss_biometric','iss_attendance_mismatch','iss_complaints_pending','iss_ro_unavail','iss_bore_unavail','iss_hygiene','iss_none']).join(", ");
+      
+      // 2. Create Description
+      let description = `Attendance: ${attendance}%. Complaints: ${complaints}. `;
+      description += `Water: ${waterStatus}. Status: ${status}. `;
+      
+      // Add new fields to description
+      if(clinical) description += `Clinical Posting: ${clinical}. `;
+      if(communication) description += `University/DME Communication: ${communication}. `;
+      
+      if (issues) description += `Issues: ${issues}. `;
+
+      // 3. Payload
+      const payload = {
+        title: "AHS Activity Report",
+        description: description,
+        status: 'new',
+        timestamp: new Date()
+      };
+
+      console.log("Submitting:", payload);
+
+      // 4. Send to Backend
+      try {
+        const response = await fetch('http://localhost:5000/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          alert('✅ AHS Report Submitted Successfully!');
+          window.location.reload(); // Refresh to reset
+        } else {
+          alert("❌ Failed to submit report.");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Server Error: Is backend running?");
+      }
+    }
+
+    /* attach HOI pill */
+    document.getElementById('hoiPill').addEventListener('click', openIntervention);
+  </script>
+
+</body>
+</html>

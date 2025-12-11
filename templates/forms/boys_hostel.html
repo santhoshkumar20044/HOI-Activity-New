@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boys Hostel Report Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary-color: #006d77; /* Teal Blue */
+            --secondary-color: #eefcfd;
+            --text-dark: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: #ffffff;
+            border-bottom: 4px solid #004d55;
+            padding: 15px 5%; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            flex-wrap: wrap; 
+            gap: 15px;
+        }
+
+        .logo-left { height: 60px; width: auto; object-fit: contain; }
+        .logo-right { height: 80px; width: auto; object-fit: contain; }
+        
+        .header-right-group { display: flex; align-items: center; gap: 15px; }
+        .header-buttons { display: flex; align-items: center; gap: 10px; }
+
+        .intervention-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #ff9800;
+            background: #ffc107;
+            color: #3e2723;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            white-space: nowrap; 
+        }
+        
+        .back-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #111827;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            padding: 30px 15px;
+        }
+
+        .card {
+            background: var(--white);
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        
+        #intervention-page { max-width: 800px; }
+
+        /* --- TITLE & TABS --- */
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 28px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;
+        }
+        
+        #intervention-page .main-title {
+            color: #d32f2f; 
+            border-bottom-color: #d32f2f;
+        }
+
+        .tabs-container {
+            display: flex; background: #f3f4f6; padding: 5px; border-radius: 8px; margin-bottom: 30px;
+            gap: 5px; justify-content: center; max-width: 400px; margin-left: auto; margin-right: auto;
+        }
+
+        .tab-btn {
+            flex: 1; padding: 12px 10px; border: none; background: transparent; cursor: pointer;
+            font-weight: 700; color: #6b7280; border-radius: 6px; transition: all 0.3s ease; font-size: 15px;
+        }
+        .tab-btn:hover { background: #e5e7eb; }
+        .tab-btn.active { background: var(--primary-color); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .report-header h2 { 
+            margin: 0 0 25px 0; color: #1f2937; font-size: 22px; border-left: 5px solid var(--primary-color); padding-left: 15px;
+        }
+
+        /* --- FORM GRID SYSTEM --- */
+        .section-box {
+            background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex; align-items: center; gap: 10px; color: var(--primary-color); font-weight: bold; margin-bottom: 20px; font-size: 16px; text-transform: uppercase;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 109, 119, 0.1);
+        }
+
+        .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #444; }
+        .checkbox-group input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; }
+
+        .submit-container { text-align: right; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 14px 40px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
+        .hidden { display: none; }
+        
+        /* --- HOI BUTTONS --- */
+        .button-group-hoi {
+            display: flex; justify-content: space-between; gap: 20px; margin-top: 30px; 
+        }
+        .submit-btn-hoi {
+            width: 50%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: all 0.3s ease; color: white !important; margin-top: 0 !important; 
+        }
+        .submit-btn-hoi.red { background-color: #d32f2f; }
+        .submit-btn-hoi.grey { background-color: #78909c; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
+            .header-buttons { order: 0; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 20px; }
+            .btn-submit { width: 100%; }
+            .button-group-hoi { flex-direction: column; gap: 15px; }
+            .submit-btn-hoi { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-section"><img src="/public/clg-logo.png" alt="Sri Shanmugha Logo" class="logo-left" onerror="this.style.display='none'"></div>
+        
+        <div class="header-right-group">
+            <div class="header-buttons">
+                <button type="button" class="intervention-btn" onclick="openInterventionPage()">
+                    🚨 HOI Intervention Needed
+                </button>
+                <button type="button" class="back-btn" onclick="history.back()">
+                    ← Back
+                </button>
+            </div>
+            <div class="brand-section"><img src="/public/aakam-logo.png" alt="Aakam 360 Logo" class="logo-right" onerror="this.style.display='none'"></div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="hostel-page" class="card">
+            
+            <h1 class="main-title">BOYS HOSTEL REPORT</h1>
+
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('Daily')">Daily</button>
+                <button class="tab-btn" onclick="switchTab('Weekly')">Weekly</button>
+            </div>
+
+            <div class="report-header">
+                <h2 id="reportTitle">Daily Report</h2>
+            </div>
+
+            <form id="reportForm">
+                
+                <div id="dailySection">
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-truck"></i> Transport & Wardens</div>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Vehicle Pickup (Hospital)</label><input type="number" id="d_vehicle_hosp" placeholder="Count"></div>
+                            <div class="form-group"><label>Vehicle Pickup (Clinical)</label><input type="number" id="d_vehicle_clin" placeholder="Count"></div>
+                            <div class="form-group"><label>Deputy Warden Availability</label><select id="d_deputy_avail"><option>Available</option><option>Not Available</option></select></div>
+                            <div class="form-group"><label>No of Deputy Wardens</label><input type="number" id="d_deputy_count" placeholder="Count"></div>
+                            <div class="form-group"><label>Joint Warden Availability</label><select id="d_joint_avail"><option>Available</option><option>Not Available</option></select></div>
+                            <div class="form-group"><label>No of Joint Wardens</label><input type="number" id="d_joint_count" placeholder="Count"></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-users"></i> Student Statistics</div>
+                        <div class="grid-4">
+                            <div class="form-group"><label>Attendance Count</label><input type="number" id="d_att_count"></div>
+                            <div class="form-group"><label>Clinical Posting</label><input type="number" id="d_clin_post"></div>
+                            <div class="form-group"><label>Out-Pass Count</label><input type="number" id="d_outpass"></div>
+                            <div class="form-group"><label>Inward Count</label><input type="number" id="d_inward"></div>
+                            <div class="form-group"><label>New Joinings</label><input type="number" id="d_new_join"></div>
+                            <div class="form-group"><label>Visitors Count</label><input type="number" id="d_visitors"></div>
+                            <div class="form-group"><label>Vacated Count</label><input type="number" id="d_vacated"></div>
+                        </div>
+                        
+                        <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                            <label style="font-size:14px; color:#666; font-weight:bold; margin-bottom:15px; display:block;">Course Breakdown</label>
+                            <div class="grid-4">
+                                <div class="form-group"><label>AHS Students</label><input type="number" id="d_course_ahs"></div>
+                                <div class="form-group"><label>Pharmacy Students</label><input type="number" id="d_course_pharm"></div>
+                                <div class="form-group"><label>Engineering Students</label><input type="number" id="d_course_eng"></div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                            <label style="font-size:14px; color:#666; font-weight:bold; margin-bottom:15px; display:block;">Region Breakdown</label>
+                            <div class="grid-4">
+                                <div class="form-group"><label>Tamil</label><input type="number" id="d_reg_tamil"></div>
+                                <div class="form-group"><label>Andhra/Telangana</label><input type="number" id="d_reg_andhra"></div>
+                                <div class="form-group"><label>Kerala</label><input type="number" id="d_reg_kerala"></div>
+                                <div class="form-group"><label>Other State</label><input type="number" id="d_reg_other"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-building"></i> Facilities & Maintenance</div>
+                        <div class="grid-3">
+                            <div class="form-group"><label>Laundry Availability</label><select id="d_laundry"><option>Available</option><option>Not Available</option><option>Not Applicable</option></select></div>
+                            <div class="form-group"><label>Student Vacant Rooms</label><input type="number" id="d_vacant_stud"></div>
+                            <div class="form-group"><label>Faculty Vacant Rooms</label><input type="number" id="d_vacant_fac"></div>
+                            <div class="form-group"><label>Maint. Register Update</label><select id="d_maint_reg"><option>Updated</option><option>Not Updated</option></select></div>
+                            <div class="form-group"><label>Gate Opening Time</label><input type="time" id="d_gate_open"></div>
+                            <div class="form-group"><label>Gate Closing Time</label><input type="time" id="d_gate_close"></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-utensils"></i> Food & Water</div>
+                        <div class="grid-3">
+                            <div class="form-group"><label>Total Food Count</label><input type="number" id="d_food_total"></div>
+                            <div class="form-group"><label>Veg Count</label><input type="number" id="d_food_veg"></div>
+                            <div class="form-group"><label>Non-Veg Count</label><input type="number" id="d_food_nonveg"></div>
+                            <div class="form-group"><label>Breakfast (Yesterday)</label><input type="number" id="d_prev_bkfst"></div>
+                            <div class="form-group"><label>Lunch (Yesterday)</label><input type="number" id="d_prev_lunch"></div>
+                            <div class="form-group"><label>Dinner (Yesterday)</label><input type="number" id="d_prev_dinner"></div>
+                            <div class="form-group"><label>Snacks (Yesterday)</label><input type="number" id="d_prev_snacks"></div>
+                        </div>
+                        
+                        <div class="grid-2" style="margin-top:15px;">
+                             <div class="form-group">
+                                <label>Food Complaints/Issues</label>
+                                <textarea id="d_food_complaints" rows="2" placeholder="Describe issues..."></textarea>
+                            </div>
+                             <div class="form-group">
+                                <label>Food Menu Change?</label>
+                                <select id="d_menu_change"><option>No change</option><option>Yes, changed</option></select>
+                            </div>
+                        </div>
+                        <div class="form-group"><label>Menu Change Details</label><input type="text" id="d_menu_details" placeholder="If yes, mention details"></div>
+
+                        <div class="grid-2">
+                             <div class="form-group"><label>Normal Water Available</label><select id="d_water_norm"><option>Yes</option><option>No</option></select></div>
+                             <div class="form-group"><label>Drinking Water Available</label><select id="d_water_drink"><option>Yes</option><option>No</option></select></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-shield-alt"></i> Security</div>
+                        <div class="grid-3">
+                            <div class="form-group"><label>Day Security</label><select id="d_sec_day"><option>Available</option><option>Not Available</option><option>Not Applicable</option></select></div>
+                            <div class="form-group"><label>Night Security</label><select id="d_sec_night"><option>Available</option><option>Not Available</option><option>Not Applicable</option></select></div>
+                            <div class="form-group"><label>Vehicle Availability</label><select id="d_sec_vehicle"><option>Available</option><option>Not Available</option></select></div>
+                        </div>
+                    </div>
+                </div> 
+
+                <div id="weeklySection" class="hidden">
+                    <div class="section-box" style="border-left: 4px solid orange;">
+                        <div class="section-header" style="color: chocolate;">
+                            <i class="fas fa-handshake"></i> Meetings & Activity Status
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Student General Meeting</label><select id="w_meet_gen"><option>Conducted</option><option>Not Conducted</option><option>Postponed</option><option>Cancelled</option></select></div>
+                            <div class="form-group"><label>Student Mess Meeting</label><select id="w_meet_mess"><option>Conducted</option><option>Not Conducted</option><option>Postponed</option><option>Cancelled</option></select></div>
+                            <div class="form-group"><label>Status of Discussed Activity</label><select id="w_status"><option>Completed</option><option>Partially Completed</option><option>Not Completed</option></select></div>
+                            <div class="form-group"><label>Reason if Not Completed</label><input type="text" id="w_reason" placeholder="Enter reason..."></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box" style="border-left: 4px solid crimson;">
+                        <div class="section-header" style="color: crimson;">
+                            <i class="fas fa-exclamation-triangle"></i> Issues & Waste Analysis
+                        </div>
+                        
+                        <div class="grid-2">
+                            <div>
+                                <label style="font-weight:bold; margin-bottom:10px; display:block; color:#333;">Issues Faced</label>
+                                <div class="checkbox-group"><input type="checkbox" name="w_issues"> <span>Food shortage / menu mismatch</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_issues"> <span>Mess team unavailable</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_issues"> <span>Maintenance pending</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_issues"> <span>Water supply issue</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_issues"> <span>Security/driver not available</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_issues"> <span>No issues</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-box" style="border-left: 4px solid #2563eb;">
+                        <div class="section-header" style="color: #2563eb;">
+                            <i class="fas fa-chart-line"></i> KPI & Support
+                        </div>
+                        <div class="form-group">
+                            <label style="font-weight:bold; margin-bottom:10px; display:block; color:#333;">KPI (Check Achieved)</label>
+                            <div class="grid-2">
+                                <div class="checkbox-group"><input type="checkbox" name="w_kpi"> <span>Service levels met</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_kpi"> <span>Attendance counts accurate</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_kpi"> <span>Maintenance updated</span></div>
+                                <div class="checkbox-group"><input type="checkbox" name="w_kpi"> <span>Food issues resolved</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="button" class="btn-submit" onclick="submitHostelReport(event)">Submit Report</button>
+                </div>
+
+            </form>
+        </div>
+        
+        <div id="intervention-page" class="card hidden">
+            <h1 class="main-title">🚨 HOI IMMEDIATE INTERVENTION REQUIRED</h1>
+            <div style="padding: 10px 0;">
+                <p style="color: #d32f2f; font-weight: 600; margin-bottom: 25px;">
+                    Use this form only for issues requiring **immediate** Head of Institution (HOI) action related to Boys Hostel operations/safety.
+                </p>
+
+                <form onsubmit="submitIntervention(event)">
+                    <div class="form-group">
+                        <label for="intervention-topic">Brief Topic/Subject:</label>
+                        <input type="text" id="intervention-topic" placeholder="e.g., Major Food Poisoning Incident, Urgent Warden Shortage" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="intervention-details">Immediate Action Required (Short Answer Field):</label>
+                        <textarea id="intervention-details" rows="5" placeholder="Clearly describe the issue and the exact intervention needed from the HOI. Be concise and factual." required></textarea>
+                    </div>
+
+                    <div class="submit-container">
+                        <div class="button-group-hoi">
+                            <button type="submit" class="submit-btn-hoi red">SUBMIT FOR IMMEDIATE HOI REVIEW</button>
+                            <button type="button" class="submit-btn-hoi grey" onclick="showHostelPage()">← RETURN TO HOSTEL REPORTS</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const hostelContainer = document.getElementById('hostel-page');
+        const interventionContainer = document.getElementById('intervention-page');
+
+        function switchTab(frequency) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            const targetButton = Array.from(buttons).find(btn => btn.textContent === frequency);
+            if (targetButton) targetButton.classList.add('active');
+
+            document.getElementById('reportTitle').innerText = frequency + ' Report';
+
+            const dailySec = document.getElementById('dailySection');
+            const weeklySec = document.getElementById('weeklySection');
+
+            if (frequency === 'Daily') {
+                dailySec.classList.remove('hidden');
+                weeklySec.classList.add('hidden');
+            } else if (frequency === 'Weekly') {
+                dailySec.classList.add('hidden');
+                weeklySec.classList.remove('hidden');
+            }
+        }
+        
+        function openInterventionPage() {
+            hostelContainer.classList.add('hidden');
+            interventionContainer.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function showHostelPage() {
+            hostelContainer.classList.remove('hidden');
+            interventionContainer.classList.add('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        async function submitHostelReport(event) {
+            event.preventDefault();
+            const activeTab = document.querySelector('.tab-btn.active').textContent;
+            
+            // Helper to get value
+            const getVal = (id) => document.getElementById(id)?.value || '';
+            const getChecked = (name) => {
+                const els = document.querySelectorAll(`input[name="${name}"]:checked`);
+                return Array.from(els).map(el => el.nextElementSibling.innerText).join(', ');
+            };
+
+            let description = '';
+
+            if (activeTab === 'Daily') {
+                description = `[Daily] Att: ${getVal('d_att_count') || 0}, OutPass: ${getVal('d_outpass') || 0}, Visitors: ${getVal('d_visitors') || 0}. `;
+                description += `Food Complaints: ${getVal('d_food_complaints') || 'None'}. `;
+                description += `Warden (D/J): ${getVal('d_deputy_avail')}/${getVal('d_joint_avail')}. `;
+                description += `Maint: ${getVal('d_maint_reg')}. `;
+            } else {
+                description = `[Weekly] Gen Meet: ${getVal('w_meet_gen')}, Mess Meet: ${getVal('w_meet_mess')}. `;
+                description += `Status: ${getVal('w_status')}. `;
+                
+                const issues = getChecked('w_issues');
+                if (issues) description += `Issues: ${issues}. `;
+                
+                const kpi = getChecked('w_kpi');
+                if (kpi) description += `KPI Achieved: ${kpi}. `;
+            }
+
+            const payload = {
+                title: "Boys Hostel Report",
+                description: description,
+                status: 'new',
+                timestamp: new Date()
+            };
+
+            console.log("🚀 Sending to Backend:", payload);
+
+            try {
+                const response = await fetch('http://localhost:5000/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert(`✅ ${activeTab} Report Submitted Successfully!`);
+                    window.location.reload(); 
+                } else {
+                    alert("❌ Failed to submit report.");
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                alert("Server Error! Make sure Backend is running.");
+            }
+        }
+        
+        function submitIntervention(event) {
+            event.preventDefault(); 
+            alert("✅ HOI Intervention Request Submitted Successfully!");
+            showHostelPage();
+        }
+
+        window.onload = function() {
+            switchTab('Daily'); 
+            showHostelPage();
+        };
+    </script>
+</body>
+</html>

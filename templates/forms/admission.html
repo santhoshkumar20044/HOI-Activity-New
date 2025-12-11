@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admissions Report — Yearly</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root{
+      --page-teal:#006d77;
+      --teal-dark:#0b6b6a;
+      --soft-bg:#f3f6f6;
+      --muted:#6b7280;
+      --card-bg:#ffffff;
+      --card-shadow:0 14px 40px rgba(3,15,15,0.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Segoe UI",Arial,sans-serif;
+      background:var(--page-teal);
+    }
+
+    /* HEADER */
+    .topbar{
+      background:white;
+      padding:14px 24px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 3px 10px rgba(0,0,0,0.06);
+    }
+    .brand-left img{height:56px}
+    .brand-right{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .pill{
+      background:linear-gradient(180deg,#ffd966,#ffca28);
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:800;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .back-btn{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid #eee;
+      background:#fff;
+      cursor:pointer;
+    }
+
+    /* PAGE */
+    .page{padding:36px 18px}
+    .card{
+      max-width:1100px;
+      margin:0 auto;
+      background:white;
+      border-radius:16px;
+      padding:32px;
+      box-shadow:var(--card-shadow);
+    }
+    .title{text-align:center;margin-bottom:12px}
+    .title h1{
+      margin:0;
+      font-size:28px;
+      color:var(--teal-dark);
+      font-weight:900;
+    }
+
+    /* SECTIONS */
+    .section{
+      background:#fbfffe;
+      border-radius:12px;
+      padding:16px;
+      border:1px solid #e6f1f1;
+      margin-bottom:14px;
+    }
+    .heading{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      color:var(--teal-dark);
+      margin-bottom:10px;
+    }
+    .heading i{
+      width:36px;
+      height:36px;
+      border-radius:8px;
+      background:#e8f6f6;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    label{
+      display:block;
+      font-weight:700;
+      color:#114;
+      margin-bottom:6px;
+    }
+    input,select,textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #e6eef0;
+      background:white;
+      font-size:14px;
+    }
+    textarea{min-height:76px;resize:vertical}
+
+    .grid{display:grid;gap:12px}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
+
+    /* CHECKBOX ALIGNMENT PERFECTED */
+    .aligned-issues{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:6px;
+    }
+    .aligned-issues label{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:8px 6px;
+      cursor:pointer;
+    }
+    .aligned-issues input{
+      width:18px;
+      height:18px;
+      transform:scale(1.15);
+    }
+
+    /* SUBMIT */
+    .submit-area{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:12px;
+      border-top:1px dashed #eaf6f6;
+      padding-top:14px;
+      gap:10px;
+    }
+    .btn{
+      padding:10px 18px;
+      border-radius:10px;
+      border:0;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .btn.primary{background:var(--teal-dark);color:#fff}
+    .btn.secondary{background:white;border:1px solid #ccc}
+
+    /* HOI POPUP */
+    .overlay{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.35);
+      z-index:9999;
+    }
+    .overlay .inner{
+      background:white;
+      border-radius:10px;
+      padding:18px;
+      width:640px;
+      max-width:94%;
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="brand-left">
+    <img src="clg logo.png" onerror="this.style.display='none'">
+  </div>
+  <div class="brand-right">
+    <div class="pill" id="hoiPill"><i class="fas fa-exclamation-circle"></i> HOI Intervention</div>
+    <button class="back-btn" onclick="history.back()">← Back</button>
+    <img src="aakam.png" style="height:56px" onerror="this.style.display='none'">
+  </div>
+</header>
+
+<div class="page">
+  <div class="card">
+    <div class="title"><h1>ADMISSIONS REPORT</h1></div>
+
+    <form id="admissionsForm">
+
+      <div class="section">
+        <div class="heading"><i class="fas fa-calendar"></i> FREQUENCY & SETUP</div>
+
+        <div class="grid grid-2">
+          <div>
+            <label>Frequency</label>
+            <select id="freq">
+              <option>Yearly</option>
+              <option>Quarterly</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+
+          <div>
+            <label>New Admission Status</label>
+            <select id="new_admission">
+              <option>Completed</option>
+              <option>Pending</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-top:12px">
+          <div>
+            <label>Consultant Status</label>
+            <select id="consultant">
+              <option>Completed</option>
+              <option>Pending</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Remuneration Finalized?</label>
+            <select id="remuneration">
+              <option>Completed</option>
+              <option>Pending</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="heading"><i class="fas fa-university"></i> COLLEGE WISE ADMISSION DETAILS</div>
+        
+        <div class="grid grid-2">
+            <div>
+                <label>Engineering College</label>
+                <input type="text" id="eng_details" placeholder="Enter details..." readonly value="Engineering" style="background:#f0f0f0;">
+            </div>
+            <div>
+                <label>Students Count</label>
+                <input type="number" id="eng_count" placeholder="0">
+            </div>
+
+            <div>
+                <label>Pharmacy College</label>
+                <input type="text" id="pharm_details" placeholder="Enter details..." readonly value="Pharmacy" style="background:#f0f0f0;">
+            </div>
+            <div>
+                <label>Students Count</label>
+                <input type="number" id="pharm_count" placeholder="0">
+            </div>
+
+            <div>
+                <label>Nursing College</label>
+                <input type="text" id="nursing_details" placeholder="Enter details..." readonly value="Nursing" style="background:#f0f0f0;">
+            </div>
+            <div>
+                <label>Students Count</label>
+                <input type="number" id="nursing_count" placeholder="0">
+            </div>
+
+            <div>
+                <label>Allied Health Sciences (AHS)</label>
+                <input type="text" id="ahs_details" placeholder="Enter details..." readonly value="AHS" style="background:#f0f0f0;">
+            </div>
+            <div>
+                <label>Students Count</label>
+                <input type="number" id="ahs_count" placeholder="0">
+            </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="heading"><i class="fas fa-tasks"></i> COMPLETION STATUS</div>
+
+        <div class="grid grid-2">
+          <div>
+            <label>Completion Status</label>
+            <select id="completion_status">
+              <option>Completed</option>
+              <option>Partially Completed</option>
+              <option>Not Completed</option>
+            </select>
+          </div>
+
+          <div>
+            <label>If Not Completed — Reason</label>
+            <input id="completion_reason" type="text">
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="heading"><i class="fas fa-exclamation-triangle"></i> ISSUES & WASTE</div>
+
+        <div class="aligned-issues">
+          <label><input id="iss_delay" type="checkbox"> Delay</label>
+          <label><input id="iss_student_delay" type="checkbox"> Student-side delay</label>
+          <label><input id="iss_doc_err" type="checkbox"> Documentation errors</label>
+          <label><input id="iss_consult_coord" type="checkbox"> Consultant coordination issue</label>
+          <label><input id="iss_fee_conf" type="checkbox"> Fee policy confusion</label>
+          <label><input id="iss_resource" type="checkbox"> Resource shortage</label>
+          <label><input id="iss_approval_delay" type="checkbox"> Approval delay</label>
+          <label><input id="iss_none" type="checkbox"> No issues</label>
+        </div>
+
+        <label style="margin-top:12px">Other Issues</label>
+        <textarea id="issues_other"></textarea>
+      </div>
+
+      <div class="section">
+        <div class="heading"><i class="fas fa-chart-line"></i> PERFORMANCE & RISK</div>
+
+        <div class="aligned-issues">
+          <label><input id="perf_targets" type="checkbox"> Targets Achieved</label>
+          <label><input id="perf_quality" type="checkbox"> Quality Improved</label>
+          <label><input id="perf_doc_ok" type="checkbox"> Documentation Error-free</label>
+          <label><input id="perf_ontime" type="checkbox"> On-Time Completion</label>
+          <label><input id="perf_not_achieved" type="checkbox"> Not Achieved</label>
+        </div>
+      </div>
+
+      <div class="submit-area">
+        <button type="button" class="btn primary" onclick="submitAdmissions()">Submit Report</button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<div id="overlay" class="overlay">
+  <div class="inner">
+    <h3 style="margin:0 0 10px;color:#b20000;font-weight:900">🚨 HOI IMMEDIATE INTERVENTION</h3>
+
+    <label>Topic</label>
+    <input id="hoi_topic" type="text">
+
+    <label style="margin-top:10px">Immediate Action Required</label>
+    <textarea id="hoi_details" rows="5"></textarea>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:12px">
+      <button class="btn secondary" onclick="closeIntervention()">Cancel</button>
+      <button class="btn primary" onclick="submitIntervention()">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ⭐ HOI BUTTON FIXED — EVENT LISTENER ADDED
+document.getElementById('hoiPill').addEventListener('click', openIntervention);
+
+function openIntervention(){
+  document.getElementById('overlay').style.display='flex';
+}
+function closeIntervention(){
+  document.getElementById('overlay').style.display='none';
+  document.getElementById('hoi_topic').value='';
+  document.getElementById('hoi_details').value='';
+}
+function submitIntervention(){
+  alert("HOI Request Submitted (mock).");
+  closeIntervention();
+}
+
+// Helper functions
+const val=id=>document.getElementById(id)?.value||"";
+const checked=id=>document.getElementById(id)?.checked||false;
+
+function submitAdmissions(){
+
+  const payload={
+    submitted_at:new Date().toISOString(),
+
+    frequency:val('freq'),
+    new_admission:val('new_admission'),
+    consultant:val('consultant'),
+    remuneration:val('remuneration'),
+    
+    college_details: {
+        engineering: val('eng_count'),
+        pharmacy: val('pharm_count'),
+        nursing: val('nursing_count'),
+        ahs: val('ahs_count')
+    },
+
+    completion_status:val('completion_status'),
+    completion_reason:val('completion_reason'),
+
+    issues:{
+      delay:checked('iss_delay'),
+      student_delay:checked('iss_student_delay'),
+      documentation_errors:checked('iss_doc_err'),
+      consultant_coordination:checked('iss_consult_coord'),
+      fee_policy_confusion:checked('iss_fee_conf'),
+      resource_shortage:checked('iss_resource'),
+      approval_delay:checked('iss_approval_delay'),
+      none:checked('iss_none'),
+      other:val('issues_other')
+    },
+
+    performance:{
+      targets:checked('perf_targets'),
+      quality:checked('perf_quality'),
+      doc_ok:checked('perf_doc_ok'),
+      on_time:checked('perf_ontime')
+    }
+  };
+  
+  console.log(payload);
+  alert("Report Submitted! Check Console.");
+}
+</script>
+
+</body>
+</html>

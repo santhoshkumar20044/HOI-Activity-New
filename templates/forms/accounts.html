@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accounts & Finance Monitoring</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet">
+    <style>
+        /* --- THEME & COLORS --- */
+        :root {
+            --primary-color: #006d77;
+            --secondary-color: #eefcfd;
+            --text-dark: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0; padding: 0; min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: #ffffff; border-bottom: 4px solid #004d55; padding: 15px 5%; 
+            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            flex-wrap: wrap; gap: 15px;
+        }
+        .logo-left { height: 60px; width: auto; object-fit: contain; }
+        .logo-right { height: 80px; width: auto; object-fit: contain; }
+        .header-right-group { display: flex; align-items: center; gap: 15px; }
+
+        /* BUTTONS */
+        .header-buttons { display: flex; align-items: center; gap: 10px; }
+        .intervention-btn {
+            padding: 8px 16px; border-radius: 999px; border: 1px solid #ff9800; background: #ffc107; 
+            color: #3e2723; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;
+        }
+        .back-btn {
+            padding: 8px 16px; border-radius: 999px; border: 1px solid #e5e7eb; background: #ffffff; 
+            color: #111827; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;
+        }
+
+        /* --- MAIN CARD --- */
+        .main-container { display: flex; justify-content: center; padding: 40px 15px; }
+        .card {
+            background: var(--white); width: 100%; max-width: 800px; border-radius: 12px; box-shadow: var(--shadow);
+            padding: 40px; box-sizing: border-box;
+        }
+        .hidden { display: none !important; } /* Added !important to ensure hiding works */
+
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 26px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 30px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;
+        }
+        #intervention-page .main-title { color: #d32f2f; border-bottom-color: #d32f2f; }
+
+        /* --- FREQUENCY TOGGLE STYLES --- */
+        .toggle-container {
+            display: flex;
+            background: #f3f4f6;
+            padding: 5px;
+            border-radius: 999px;
+            margin-bottom: 25px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+            gap: 5px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 10px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .toggle-btn:hover {
+            color: var(--primary-color);
+            background: rgba(0, 109, 119, 0.05);
+        }
+
+        .toggle-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 109, 119, 0.2);
+            font-weight: 700;
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .form-section { display: flex; flex-direction: column; gap: 20px; }
+        .section-header { font-size: 18px; color: var(--primary-color); font-weight: bold; margin-top: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 5px; }
+        
+        .form-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px; }
+        .form-group label { font-weight: 700; font-size: 14px; color: #374151; }
+        .form-group select, .form-group input[type="text"], .form-group input[type="number"] {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; background-color: #f9fafb; box-sizing: border-box;
+        }
+
+        /* RADIO STYLES */
+        .options-group { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 5px; }
+        .radio-label {
+            display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; color: #555; background: #f3f4f6; 
+            padding: 8px 12px; border-radius: 6px; transition: all 0.2s;
+        }
+        .radio-label:hover { background: #e5e7eb; }
+        .radio-label input { accent-color: var(--primary-color); transform: scale(1.2); }
+        .radio-label.selected { background: #e0f2f1; border-color: var(--primary-color); color: var(--primary-color); font-weight: bold; }
+
+        /* REASON BOX (Hidden by default) */
+        .reason-box {
+            margin-top: 10px; padding: 10px; background: #fff3e0; border: 1px solid #ffe0b2; border-radius: 6px;
+            animation: slideDown 0.3s ease-out;
+        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .reason-box input { width: 100%; border: 1px solid #ffcc80; padding: 8px; border-radius: 4px; }
+
+        /* SUBMIT BUTTON */
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 12px 40px; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: bold; cursor: pointer; width: auto; display: block; margin: 30px auto 0 auto; text-transform: uppercase;
+        }
+        
+        /* HOI BUTTONS */
+        .button-group-hoi { display: flex; gap: 15px; margin-top: 20px; }
+        .submit-btn-hoi { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; }
+        .submit-btn-hoi.red { background-color: #d32f2f; }
+        .submit-btn-hoi.grey { background-color: #78909c; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; padding: 15px; }
+            .header-buttons { width: 100%; justify-content: center; }
+            .card { padding: 25px; }
+            .btn-submit { width: 100%; }
+            .toggle-container { flex-wrap: wrap; border-radius: 12px; }
+        }
+    </style>
+  </head>
+  <body>
+
+    <header>
+      <div class="brand-section"><img src="/public/clg-logo.png" alt="Logo Left"
+          class="logo-left"></div>
+      <div class="header-right-group">
+        <div class="header-buttons">
+          <button type="button" class="intervention-btn"
+            onclick="openInterventionPage()">🚨 HOI Intervention Needed</button>
+          <button
+            type="button"
+            class="back-btn"
+            onclick="history.back()">
+            ← Back
+          </button>
+        </div>
+        <img src="/public/aakam-logo.png" alt="Logo Right" class="logo-right">
+      </div>
+    </header>
+
+    <div class="main-container">
+
+      <div id="finance-page" class="card">
+        <h1 class="main-title"><i class="fas fa-file-invoice-dollar"
+            style="margin-right: 10px;"></i> Accounts & Finance</h1>
+
+        <form onsubmit="submitForm(event)">
+
+          <div class="form-group">
+            <label style="text-align:center; margin-bottom:10px;">Select Frequency</label>
+            
+            <div class="toggle-container">
+                <button type="button" class="toggle-btn active" onclick="setFrequency('Daily', this)">Daily</button>
+                <button type="button" class="toggle-btn" onclick="setFrequency('Monthly', this)">Monthly</button>
+                <button type="button" class="toggle-btn" onclick="setFrequency('Bi-Monthly', this)">Bi-Monthly</button>
+                <button type="button" class="toggle-btn" onclick="setFrequency('Yearly', this)">Yearly</button>
+            </div>
+            
+            <input type="hidden" id="frequency" value="Daily">
+          </div>
+
+          <div id="daily-section" class="form-section">
+            <div class="section-header">Daily Activities</div>
+
+            <div class="form-group">
+              <label>Cash handling status</label>
+              <div class="options-group">
+                <label class="radio-label"><input type="radio"
+                    name="cash_status" value="Completed"
+                    onclick="toggleReason(this)"> Completed</label>
+                <label class="radio-label"><input type="radio"
+                    name="cash_status" value="Partially"
+                    onclick="toggleReason(this)"> Partially</label>
+                <label class="radio-label"><input type="radio"
+                    name="cash_status" value="Not Completed"
+                    onclick="toggleReason(this)"> Not Completed</label>
+              </div>
+              <div class="reason-box hidden">
+                <label style="font-size:12px; color:#d84315;">Reason / Short Answer:</label>
+                <input type="text" placeholder="Why is this partially/not completed?">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Tally Update</label>
+              <div class="options-group">
+                <label class="radio-label"><input type="radio" name="tally"
+                    value="Completed" onclick="toggleReason(this)">
+                  Completed</label>
+                <label class="radio-label"><input type="radio" name="tally"
+                    value="In Progress" onclick="toggleReason(this)"> In
+                  Progress</label>
+                <label class="radio-label"><input type="radio" name="tally"
+                    value="Not Completed" onclick="toggleReason(this)"> Not
+                  Completed</label>
+              </div>
+              <div class="reason-box hidden">
+                <label style="font-size:12px; color:#d84315;">Reason / Short Answer:</label>
+                <input type="text" placeholder="Enter details...">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Purchase Order Maintenance</label>
+              <div class="options-group">
+                <label class="radio-label"><input type="radio" name="po"
+                    value="Completed" onclick="toggleReason(this)">
+                  Completed</label>
+                <label class="radio-label"><input type="radio" name="po"
+                    value="Pending" onclick="toggleReason(this)">
+                  Pending</label>
+                <label class="radio-label"><input type="radio" name="po"
+                    value="Not Started" onclick="toggleReason(this)"> Not
+                  Started</label>
+              </div>
+              <div class="reason-box hidden">
+                <label style="font-size:12px; color:#d84315;">Reason / Short Answer:</label>
+                <input type="text" placeholder="Enter details...">
+              </div>
+            </div>
+          </div>
+
+          <div id="monthly-section" class="form-section hidden">
+            <div class="section-header">Monthly Activities</div>
+
+            <div class="form-group">
+              <label>ERP Modules</label>
+              <div class="options-group">
+                <label class="radio-label"><input type="radio" name="erp"
+                    value="Completed" onclick="toggleReason(this)">
+                  Completed</label>
+                <label class="radio-label"><input type="radio" name="erp"
+                    value="In Progress" onclick="toggleReason(this)"> In
+                  Progress</label>
+                <label class="radio-label"><input type="radio" name="erp"
+                    value="Not Completed" onclick="toggleReason(this)"> Not
+                  Completed</label>
+              </div>
+              <div class="reason-box hidden">
+                <label style="font-size:12px; color:#d84315;">Reason / Short Answer:</label>
+                <input type="text" placeholder="Why is ERP update pending?">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Demand Updates</label>
+              <div class="options-group">
+                <label class="radio-label"><input type="radio" name="demand"
+                    value="Completed" onclick="toggleReason(this)">
+                  Completed</label>
+                <label class="radio-label"><input type="radio" name="demand"
+                    value="In Progress" onclick="toggleReason(this)"> In
+                  Progress</label>
+              </div>
+              <div class="reason-box hidden">
+                <label style="font-size:12px; color:#d84315;">Reason / Short Answer:</label>
+                <input type="text" placeholder="Details...">
+              </div>
+            </div>
+          </div>
+
+          <div id="common-section" class="form-section"
+            style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
+            <div class="section-header">Completion & Impact Analysis</div>
+
+            <div class="form-group">
+              <label>Status of Activity</label>
+              <div class="options-group">
+                <label class="radio-label"><input type="radio" name="status"
+                    value="Completed" onclick="toggleReason(this)">
+                  Completed</label>
+                <label class="radio-label"><input type="radio" name="status"
+                    value="In Progress" onclick="toggleReason(this)"> In
+                  Progress</label>
+                <label class="radio-label"><input type="radio" name="status"
+                    value="Not Completed" onclick="toggleReason(this)"> Not
+                  Completed</label>
+              </div>
+              <div class="reason-box hidden">
+                <label style="font-size:12px; color:#d84315;">Reason / Short Answer:</label>
+                <input type="text" placeholder="Why is the activity delayed?">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Financial / Compliance Impact</label>
+              <div class="options-group">
+                <label class="radio-label"><input type="radio" name="impact"
+                    value="No Impact"> No Impact</label>
+                <label class="radio-label"><input type="radio" name="impact"
+                    value="Minor Delay"> Minor Delay</label>
+                <label class="radio-label"><input type="radio" name="impact"
+                    value="Moderate Risk"> Moderate Risk</label>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                <label style="color:var(--primary-color); font-size:16px;">Authorization & Verification</label>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="flex:1; min-width: 200px;">
+                        <label style="font-size:12px; color:#555;">Entry Made By</label>
+                        <input type="text" id="entry_by" placeholder="Name / Role" required>
+                    </div>
+                    <div style="flex:1; min-width: 200px;">
+                        <label style="font-size:12px; color:#555;">Approved By</label>
+                        <input type="text" id="approved_by" placeholder="Name / Role" required>
+                    </div>
+                </div>
+              <div class="submit-area">
+          <button type="button" class="btn primary" onclick="submitAcademics(event)">Submit Report</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="inner">
+      <h3>🚨 HOI IMMEDIATE INTERVENTION REQUIRED</h3>
+      <p>Use only for urgent issues requiring HOI action.</p>
+
+      <div style="margin-top:12px">
+        <label for="hoi_topic">Topic</label>
+        <input id="hoi_topic" type="text">
+      </div>
+
+      <div style="margin-top:12px">
+        <label for="hoi_details">Immediate Action Required</label>
+        <textarea id="hoi_details" rows="5"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+        <button class="btn secondary" onclick="closeIntervention()">Cancel</button>
+        <button class="btn primary" onclick="submitIntervention()">Submit to HOI</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Tab list
+  const panels = ['Daily','Weekly','Monthly','Semester','Half','Yearly'];
+  function switchTab(name){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const btn = document.getElementById('tab' + name);
+    if(btn) btn.classList.add('active');
+
+    const titleMap = {
+      Daily:'Daily Report', Weekly:'Weekly Report', Monthly:'Monthly Report',
+      Semester:'Semester Report', Half:'Half-Yearly Report', Yearly:'Yearly Report'
+    };
+    document.getElementById('reportTitle').textContent = titleMap[name] || name;
+
+    panels.forEach(p => {
+      const el = document.getElementById('panel-' + p);
+      if(el) el.style.display = (p === name) ? 'block' : 'none';
+    });
+
+    window.scrollTo({ top: document.querySelector('.card').offsetTop - 10, behavior: 'smooth' });
+  }
+
+  // HOI overlay handlers
+  function openIntervention(){ document.getElementById('overlay').style.display='flex'; document.getElementById('hoi_topic').focus(); }
+  function closeIntervention(){ document.getElementById('overlay').style.display='none'; document.getElementById('hoi_topic').value=''; document.getElementById('hoi_details').value=''; }
+
+  // 🚨 HOI INTERVENTION SUBMISSION LOGIC (Mock/Placeholder)
+  function submitIntervention(){
+    const topic = document.getElementById('hoi_topic').value.trim();
+    const details = document.getElementById('hoi_details').value.trim();
+    if(!topic || !details){ alert('Please fill Topic and Details.'); return; }
+    
+    // In a real application, you would create a separate submission here.
+    const hoiPayload = {
+      form_type: "HOI_INTERVENTION",
+      form_user: SUBMITTER_USER_EMAIL,
+      subject: `HOI Intervention: ${topic}`,
+      topic: topic,
+      details: details,
+    };
+    
+    // Mocking the submission process
+    console.log("🚀 Sending HOI Intervention to Backend (Mock):", hoiPayload);
+    alert('✅ HOI Intervention submitted (mock). A real call would be made here.');
+    closeIntervention();
+  }
+
+  // Helper function to safely get value from ID
+  const val = id => (document.getElementById(id) ? document.getElementById(id).value : '');
+  
+  // Helper to collect all form data fields from the active panel
+  function getAllFormData() {
+      const formData = {};
+      const formElement = document.getElementById('academicsForm');
+      
+      // Get all input, select, textarea elements within the form
+      const elements = formElement.querySelectorAll('input, select, textarea');
+      
+      elements.forEach(el => {
+          // Only collect data from the currently visible panel
+          if (el.closest('.panel') && el.closest('.panel').style.display === 'none') {
+              return; 
+          }
+          
+          if (el.id) {
+              if (el.type === 'checkbox') {
+                  // Handle Checkboxes (group them by name if needed, but here we use ID for specific items)
+                  if (el.checked) {
+                      formData[el.id] = el.value || true;
+                  }
+              } else if (el.type === 'number') {
+                  // Convert number inputs to actual numbers if they have a value
+                   const numberValue = parseFloat(el.value);
+                   formData[el.id] = isNaN(numberValue) ? el.value : numberValue;
+              } else {
+                  // For text, select, textarea
+                  formData[el.id] = el.value.trim();
+              }
+          }
+      });
+      return formData;
+  }
+
+
+  // 🌟 REAL SUBMISSION LOGIC - MODIFIED FOR /api/submit_form
+  function submitAcademics(event) {
+    if(event) event.preventDefault();
+
+    // 1. Determine currently active tab/frequency
+    const activeBtn = document.querySelector('.tab-btn.active');
+    const frequency = activeBtn ? activeBtn.innerText : 'Unknown';
+    const form_type = 'academics.html'; // Matches the filename used in app.py
+
+    // 2. Collect ALL form data (only visible fields will have meaningful content)
+    const formData = getAllFormData();
+
+    // 3. Construct a title and description based on the active tab for the 'subject' field
+    let title = `Academics - ${frequency} Report`;
+    let description = '';
+
+    // Create a meaningful description for the submission record
+    if (frequency === 'Daily') {
+        const scheduled = formData['daily_main_scheduled'] || 0;
+        const conducted = formData['daily_main_conducted'] || 0;
+        const status = formData['daily_status_activity'] || 'N/A';
+        description = `Scheduled: ${scheduled}, Conducted: ${conducted}. Status: ${status}. Remarks: ${formData['daily_main_remarks'].substring(0, 50)}...`;
+    } else if (frequency === 'Weekly') {
+        const scheduled = formData['weekly_main_scheduled'] || 0;
+        const conducted = formData['weekly_main_conducted'] || 0;
+        description = `Weekly Scheduled: ${scheduled}, Conducted: ${conducted}.`;
+    } else if (frequency === 'Semester') {
+        const syllabus = formData['sem_main_syllabus_pct'] || 0;
+        description = `Syllabus Completion: ${syllabus}%.`;
+    } 
+    // Default or other frequencies use the simple title
+    if (!description) {
+        description = title;
+    }
+
+
+    // 4. Final Payload Construction
+    const payload = {
+        // Required by app.py's /api/submit_form
+        form_type: form_type,
+        form_user: SUBMITTER_USER_EMAIL, // Passed from Flask session
+        subject: title, 
+        
+        // All form data is passed under the root level (app.py expects JSON dump of all data)
+        ...formData, 
+        
+        // Add description to the payload for easy reference if needed
+        submission_description: description
+    };
+
+    console.log("🚀 Sending to Backend:", payload);
+    document.querySelector('.submit-area .btn.primary').disabled = true; // Prevent double submission
+
+    fetch('/api/submit_form', { // Use relative path, assuming Flask is running on the same domain
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector('.submit-area .btn.primary').disabled = false;
+        if (data.success) {
+            console.log("✅ Success:", data);
+            alert(`✅ ${frequency} Report Submitted Successfully! Submission ID: ${data.id}. Status: Today Activity.`);
+            // Redirect to the Submitter Dashboard for status tracking
+            window.location.href = '/submitter_dashboard'; 
+        } else {
+            console.error('❌ Backend Error:', data);
+            alert(`Submission Failed! Message: ${data.message || 'Check server logs for details.'}`);
+        }
+    })
+    .catch((error) => {
+        document.querySelector('.submit-area .btn.primary').disabled = false;
+        console.error('❌ Network Error:', error);
+        alert("Network Error! Could not connect to the API. Make sure your Flask server is running.");
+    });
+  }
+
+  // initialize default view
+  (function(){ switchTab('Daily'); })();
+
+  // HOI pill click
+  document.getElementById('hoiPill').addEventListener('click', openIntervention);
+</script>
+</body>
+</html>

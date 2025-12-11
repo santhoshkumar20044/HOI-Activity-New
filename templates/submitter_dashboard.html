@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Portal - Submission Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Custom Styles for better display */
+        .truncate-title {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 250px; 
+        }
+        .status-tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        /* Active Sidebar Item Style */
+        .user-sidebar-item.active {
+            background-color: #3b82f6; /* blue-600 */
+            color: white;
+        }
+        .user-sidebar-item:not(.active):hover {
+            background-color: #eff6ff; /* blue-50 */
+            color: #1d4ed8; /* blue-700 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans" onload="initUserDashboard()">
+    
+    <div class="flex h-screen overflow-hidden">
+
+        <aside id="sidebar" class="w-64 bg-white shadow-xl flex-shrink-0 flex flex-col transition-all duration-300">
+            <div class="p-6 border-b border-gray-200">
+                <h1 class="text-xl font-bold text-blue-700"> Employee Portal</h1>
+                <p class="text-xs text-gray-500 truncate" id="userEmailDisplay">Loading...</p>
+            </div>
+            <nav class="flex-grow p-4 space-y-2">
+                <button onclick="switchUserSection('forms-list')" data-section="forms-list" class="user-sidebar-item w-full flex items-center p-3 text-sm font-medium text-gray-600 rounded-lg transition duration-150 active">
+                    <span class="material-icons mr-3">create</span>
+                    New Submission
+                </button>
+                <button onclick="switchUserSection('my-submissions')" data-section="my-submissions" class="user-sidebar-item w-full flex items-center p-3 text-sm font-medium text-gray-600 rounded-lg transition duration-150">
+                    <span class="material-icons mr-3">list_alt</span>
+                    My Status Tracker
+                    <span id="submissionCount" class="ml-auto bg-gray-200 text-gray-800 px-2 rounded-full text-xs font-bold">0</span>
+                </button>
+                
+                <a href="{{ url_for('logout') }}" class="w-full flex items-center p-3 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 mt-10 transition duration-150">
+                    <span class="material-icons mr-3">logout</span>
+                    Logout
+                </a>
+            </nav>
+        </aside>
+
+        <div class="flex-1 flex flex-col overflow-auto">
+            
+            <header class="flex items-center justify-between p-4 bg-white shadow-md flex-shrink-0">
+                <div class="text-2xl font-semibold text-gray-700" id="userHeaderTitle">New Submission</div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="fetchUserSubmissions(true)" class="p-2 text-gray-500 rounded-full hover:bg-gray-100 transition duration-150" title="Refresh Data">
+                        <span class="material-icons">refresh</span>
+                    </button>
+                    <span class="text-sm font-medium text-gray-600">Role: Submitter</span>
+                </div>
+            </header>
+
+            <main class="p-6 flex-1 overflow-y-auto">
+                <div id="userMainContent">
+                    <p class="text-center text-gray-500 py-10">Loading dashboard data...</p>
+                </div>
+            </main>
+
+        </div>
+    </div>
+    
+    <div id="userModalOverlay" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-40 p-4">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-auto p-6 transition-all duration-300 transform scale-95" id="userModalContentArea">
+            <div class="flex justify-between items-start border-b pb-3 mb-4">
+                <h3 id="userModalTitle" class="text-xl font-bold text-gray-800">Submission Details</h3>
+                <button onclick="closeUserModal()" class="material-icons text-gray-400 hover:text-gray-600">close</button>
+            </div>
+            
+            <div class="max-h-[70vh] overflow-y-auto pr-2">
+                <div id="userDetailsContent" class="bg-gray-50 p-4 rounded-lg space-y-3 text-sm">
+                    Loading full submission data...
+                </div>
+                <div class="flex justify-end space-x-3 mt-6 border-t pt-4">
+            <button onclick="closeUserModal()" class="px-4 py-2 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition duration-150">Close</button>
+        </div>
+            </div>
+        </div>
+    </div>
+    
+<script>
+    // --- GLOBAL VARIABLES AND CONSTANTS ---
+    
+    let userSubmissions = []; // Holds the list of submissions from the server
+    let activeUserSection = 'forms-list'; // Default active section on load
+    
+    // Data passed from Flask backend
+    const USER_EMAIL = '{{ user_email | default("submitter@default.com") }}'; 
+    
+    // 🌟 THIS IS THE KEY FIX: The single form filename assigned to this user
+    // This variable is populated by the Jinja template engine on the server (using assigned_form from app.py).
+    const ASSIGNED_FORM_FILENAME = '{{ assigned_form | default("") }}'; 
+    
+    // --- INITIALIZATION AND DATA FETCHING ---
+
+    /** Runs on body load to set up the user dashboard. */
+    async function initUserDashboard() {
+        document.getElementById('userEmailDisplay').textContent = USER_EMAIL;
+        
+        // Fetch data and render the default section
+        await fetchUserSubmissions(); 
+        switchUserSection(activeUserSection); 
+    }
+    
+    /** Fetches the current user's submissions data from the Flask API. */
+    async function fetchUserSubmissions(isManualRefresh = false) {
+        
+        if (isManualRefresh && activeUserSection !== 'forms-list') {
+            document.getElementById('userMainContent').innerHTML = '<p class="text-center text-gray-500 py-10"><span class="material-icons animate-spin text-xl text-blue-500">cached</span> Refreshing data...</p>';
+        }
+
+        try {
+            const response = await fetch('/api/submissions'); 
+            
+            if (response.status === 403) {
+                console.error('Unauthorized to fetch submissions. This should not happen for a logged-in user.');
+                document.getElementById('userMainContent').innerHTML = '<p class="text-center text-red-500 py-10">Unauthorized: Cannot fetch submission data. Please log in again.</p>';
+                userSubmissions = [];
+                updateUserSidebarCounts();
+                return;
+            }
+
+            const allSubmissions = await response.json();
+
+            // Filter data locally for this specific user 
+            userSubmissions = allSubmissions
+                .filter(s => s.user === USER_EMAIL)
+                .map(s => ({
+                    ...s,
+                    // Convert submittedAt and approvedAt from seconds (REAL in SQLite) to milliseconds
+                    submittedAt: s.submittedAt * 1000, 
+                    approvedAt: s.approvedAt ? s.approvedAt * 1000 : null 
+                }));
+                
+            console.log(`User Submissions loaded: ${userSubmissions.length} forms for ${USER_EMAIL}`);
+            updateUserSidebarCounts();
+            
+            if (isManualRefresh) {
+                 switchUserSection(activeUserSection);
+            }
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            document.getElementById('userMainContent').innerHTML = '<p class="text-center text-red-500 py-10">Failed to load data. Check server connection or API endpoint.</p>';
+            userSubmissions = []; 
+        }
+    }
+    
+    /** Updates the submission count in the sidebar. */
+    function updateUserSidebarCounts() {
+        document.getElementById('submissionCount').textContent = userSubmissions.length;
+    }
+
+    // --- HELPER FUNCTION: FORMAT FORM FILENAME ---
+    /** Converts a filename (e.g., 'academics.html') into a display title (e.g., 'ACADEMICS ACTION TABLE'). */
+    function formatFormFilename(filename) {
+        if (!filename) return "NO FORM ASSIGNED";
+        
+        // 1. Remove .html extension
+        let baseName = filename.replace('.html', '');
+        
+        // 2. Replace underscores with spaces and capitalize
+        let displayTitle = baseName.replace(/_/g, ' ').toUpperCase();
+        
+        // 3. Append ' ACTION TABLE'
+        return displayTitle + ' ACTION TABLE';
+    }
+
+
+    // --- SECTION RENDERING AND NAVIGATION ---
+
+    /** Switches the main content view based on the selected section. */
+    function switchUserSection(section) {
+        activeUserSection = section;
+        const mainContent = document.getElementById('userMainContent');
+        const headerTitle = document.getElementById('userHeaderTitle');
+        
+        // Reset active state for all sidebar buttons
+        document.querySelectorAll('.user-sidebar-item').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Set active state for the clicked button
+        const activeButton = document.querySelector(`button[data-section="${section}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+
+        switch (section) {
+            case 'forms-list':
+                headerTitle.textContent = 'New Form Submission';
+                renderUserFormsListSection(mainContent); 
+                break;
+            case 'my-submissions':
+                headerTitle.textContent = 'My Submitted Forms Status';
+                renderUserSubmissionsList(mainContent); 
+                break;
+            default:
+                headerTitle.textContent = 'Employee Portal';
+                mainContent.innerHTML = '<p class="text-center py-10 text-gray-500">Select an option from the sidebar.</p>';
+        }
+    }
+    
+    /** Renders ONLY the single form assigned to the user using ASSIGNED_FORM_FILENAME. */
+    function renderUserFormsListSection(mainContent) {
+        
+        const formFilename = ASSIGNED_FORM_FILENAME; // Get the single assigned form
+        
+        if (!formFilename) {
+            mainContent.innerHTML = `
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <p class="text-center text-red-500 py-10">
+                        ❌ **No Form Assigned:** Your account has no form template assigned. Please contact the administrator.
+                    </p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Use the new formatting function
+        const formTypeDisplay = formatFormFilename(formFilename);
+        
+        // IMPORTANT FIX: Use formFilename to construct the link
+        const formLink = `/forms/${formFilename}`;
+
+        const formHtml = `
+            <div class="p-4 bg-white border border-blue-200 rounded-lg shadow-md flex items-center justify-between transition duration-150 transform hover:scale-[1.02]">
+                <div class="flex flex-col">
+                    <span class="text-lg font-bold text-blue-700">🎯 ${formTypeDisplay}</span>
+                    <p class="text-sm text-gray-500 mt-1">Your assigned submission form. Click below to start.</p>
+                </div>
+                <a href="${formLink}" target="_blank" class="flex-shrink-0 flex justify-center items-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition duration-150 space-x-2 text-base shadow-lg">
+                    <span class="material-icons">edit_note</span>
+                    <span>Start New Submission</span>
+                </a>
+            </div>
+        `;
+
+        mainContent.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h4 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                    <span class="material-icons text-blue-500 mr-2">note_add</span> New Submission Form
+                </h4>
+                <p class="text-gray-600 mb-8 border-b pb-4">This is the **only form** assigned to your employee account. All submissions will be tracked in the 'My Status Tracker' tab and sent to the Head of Institution (HOI) for review.</p>
+                <div class="max-w-3xl mx-auto">
+                    ${formHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    /** Renders the current user's submissions as a table. */
+    function renderUserSubmissionsList(mainContent) {
+        const sortedSubmissions = userSubmissions.sort((a, b) => b.submittedAt - a.submittedAt);
+        
+        const tableRows = sortedSubmissions.length > 0
+            ? sortedSubmissions.map(s => {
+                const statusTag = getStatusTag(s.status);
+                // Use the new formatting function for the display name in the table
+                const formDisplay = formatFormFilename(s.form).replace(' ACTION TABLE', ''); 
+                return `
+                <tr onclick="openUserModal('${s.id}')" class="border-b hover:bg-gray-50 cursor-pointer">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${formDisplay}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate-title">${s.subject}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">${statusTag}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(s.submittedAt).toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <span class="text-blue-600 hover:text-blue-900">View Details</span>
+                    </td>
+                </tr>
+            `;
+            }).join('')
+            : `<tr><td colspan="5" class="px-6 py-10 text-center text-gray-500 text-base">You have no submitted forms yet.</td></tr>`;
+
+        mainContent.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h4 class="text-xl font-semibold text-gray-800 mb-4">My Status Tracker (${sortedSubmissions.length} Submissions)</h4>
+                <div class="overflow-x-auto border rounded-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Type</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject/Title</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted Date</th>
+                                <th scope="col" class="relative px-6 py-3"><span class="sr-only">Action</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+    
+    /** Helper function to return styled status tag */
+    function getStatusTag(status) {
+        let colorClass;
+        let icon;
+        let displayText;
+        switch (status) {
+            case 'approved':
+                colorClass = 'bg-green-100 text-green-700 border border-green-300';
+                icon = 'check_circle';
+                displayText = 'APPROVED';
+                break;
+            case 'disapproved':
+                colorClass = 'bg-red-100 text-red-700 border border-red-300';
+                icon = 'cancel';
+                displayText = 'DISAPPROVED';
+                break;
+            case 'pending':
+                colorClass = 'bg-orange-100 text-orange-700 border border-orange-300';
+                icon = 'watch_later';
+                displayText = 'PENDING REVIEW';
+                break;
+            case 'activity':
+                colorClass = 'bg-blue-100 text-blue-700 border border-blue-300';
+                icon = 'schedule';
+                displayText = 'TODAY ACTIVITY'; // New status from app.py
+                break;
+            case 'alert':
+                colorClass = 'bg-red-200 text-red-900 border border-red-400';
+                icon = 'warning';
+                displayText = 'ALERT FLAG';
+                break;
+            default:
+                colorClass = 'bg-gray-100 text-gray-600 border border-gray-300';
+                icon = 'help';
+                displayText = status.toUpperCase();
+        }
+        return `
+            <span class="status-tag ${colorClass} flex items-center">
+                <span class="material-icons text-sm mr-1">${icon}</span>
+                ${displayText}
+            </span>
+        `;
+    }
+
+
+    // --- MODAL FUNCTIONS ---
+
+    /** Opens the modal to view full submission details for the user. */
+    async function openUserModal(submissionId) {
+        const submission = userSubmissions.find(s => s.id === submissionId);
+        
+        if (!submission) {
+            alert(`Error: Submission ID ${submissionId} not found in local data.`);
+            return;
+        }
+
+        const formDisplay = formatFormFilename(submission.form); // Use the formatting function
+        document.getElementById('userModalTitle').textContent = `Submission Details: ${formDisplay.replace(' ACTION TABLE', '')}`;
+        
+        const loadingHtml = `
+            <div class="text-center py-4"><span class="material-icons animate-spin text-blue-500">cached</span> Loading full details...</div>
+        `;
+        document.getElementById('userDetailsContent').innerHTML = loadingHtml;
+
+        document.getElementById('userModalOverlay').classList.remove('hidden');
+
+        try {
+            // Fetch the full data and remarks from the dedicated API
+            const response = await fetch(`/api/submission/${submissionId}`); 
+            const data = await response.json();
+
+            if (data.success) {
+                const fullSubmission = data.submission;
+                const statusTag = getStatusTag(fullSubmission.status);
+                
+                let dataContentHtml = '';
+                let remarksHtml = '';
+                
+                // 1. Parse Submitted Data
+                if (fullSubmission.data) {
+                    try {
+                        const parsedData = JSON.parse(fullSubmission.data);
+                        
+                        // Start section for submitted form fields
+                        dataContentHtml += '<div class="bg-white p-3 rounded max-h-40 overflow-y-auto border border-gray-300 space-y-1">';
+                        
+                        Object.entries(parsedData).forEach(([key, value]) => {
+                            // Skip system fields or empty values
+                            if (value === null || value === undefined || value === "" || key === "form_type" || key === "form_user" || key === "subject" || key === "title" || key === "description" || key === "type" || key === "status") return; 
+                            
+                            const keyDisplay = key.toUpperCase().replace(/_/g, ' '); 
+                            // Handle complex values (like arrays/objects) by stringifying them
+                            const valueDisplay = typeof value === 'object' && value !== null ? JSON.stringify(value, null, 2) : value;
+
+                            dataContentHtml += `
+                                <p class="text-xs leading-tight">
+                                    <strong class="text-gray-700">${keyDisplay}:</strong> 
+                                    <span class="text-gray-600">${valueDisplay}</span>
+                                </p>
+                            `;
+                        });
+                        dataContentHtml += '</div>';
+                        
+                        // Check if the content is just the wrapping div (meaning all data fields were skipped/empty)
+                        if (dataContentHtml.endsWith('<div class="bg-white p-3 rounded max-h-40 overflow-y-auto border border-gray-300 space-y-1"></div>')) {
+                            dataContentHtml = `<p class="text-gray-500 text-xs mt-2">No detailed form data fields found.</p>`;
+                        }
+
+                    } catch (e) {
+                        dataContentHtml = `<p class="text-red-500 text-xs mt-2">Error parsing submitted JSON data.</p>`;
+                    }
+                }
+                
+                // 2. Display HOI Remarks
+                if (fullSubmission.remarks) {
+                    let remarksColor = fullSubmission.status === 'disapproved' || fullSubmission.status === 'alert' ? 'bg-red-50 border-red-300 text-red-800' : 'bg-green-50 border-green-300 text-green-800';
+                    remarksHtml = `
+                        <div class="mt-4 p-3 border rounded-lg ${remarksColor}">
+                            <p class="font-bold mb-1 flex items-center">
+                                <span class="material-icons text-base mr-1">comment</span>
+                                HOI Reviewer Remarks (${fullSubmission.reviewedBy || 'N/A'}):
+                            </p>
+                            <p class="whitespace-pre-wrap text-sm">${fullSubmission.remarks}</p>
+                        </div>
+                    `;
+                } else if (fullSubmission.status !== 'activity' && fullSubmission.status !== 'pending') {
+                    // Show a placeholder if status is reviewed (approved/disapproved/alert) but remarks were missing
+                     remarksHtml = `
+                        <div class="mt-4 p-3 border rounded-lg bg-gray-50 border-gray-300 text-gray-700">
+                            <p class="font-bold mb-1 flex items-center">
+                                <span class="material-icons text-base mr-1">comment</span>
+                                Reviewer Remarks:
+                            </p>
+                            <p class="whitespace-pre-wrap text-sm">No specific remarks were provided by the reviewer.</p>
+                        </div>
+                    `;
+                }
+
+                // 3. Assemble Final Details
+                const submittedTime = new Date(fullSubmission.submittedAt * 1000).toLocaleString();
+                const processedTime = fullSubmission.approvedAt ? new Date(fullSubmission.approvedAt * 1000).toLocaleString() : 'N/A';
+                
+                const detailsHtml = `
+                    <p class="text-sm"><strong>Submission ID:</strong> ${fullSubmission.id}</p>
+                    <p class="text-sm"><strong>Form Subject:</strong> ${fullSubmission.subject}</p>
+                    <p class="text-sm"><strong>Current Status:</strong> ${statusTag}</p>
+                    <p class="text-sm"><strong>Submitted At:</strong> ${submittedTime}</p>
+                    <p class="text-sm"><strong>Processed At:</strong> ${processedTime}</p>
+                    
+                    ${remarksHtml}
+
+                    <div class="mt-4">
+                        <strong class="block mb-1 text-gray-700">Your Submitted Data Fields:</strong> 
+                        ${dataContentHtml}
+                    </div>
+                `;
+                document.getElementById('userDetailsContent').innerHTML = detailsHtml;
+
+            } else {
+                document.getElementById('userDetailsContent').innerHTML = `<p class="text-red-500 mt-2">Error loading full details: ${data.message}</p>`;
+            }
+        } catch (e) {
+            console.error("Fetch Details Error:", e);
+            document.getElementById('userDetailsContent').innerHTML = `<p class="text-red-500 mt-2">Network error while fetching details. Try refreshing the page.</p>`;
+        }
+    }
+
+    /** Closes the user details modal. */
+    function closeUserModal() {
+        document.getElementById('userModalOverlay').classList.add('hidden');
+    }
+    
+    // Set default section to 'forms-list' (New Submission) on initial load
+    document.addEventListener('DOMContentLoaded', () => {
+        // Automatically selects and clicks the default 'forms-list' button
+        const defaultButton = document.querySelector('button[data-section="forms-list"]');
+        if(defaultButton) {
+            // Wait briefly to ensure initUserDashboard is about to run
+            setTimeout(() => {
+                defaultButton.click();
+            }, 50); 
+        }
+    });
+
+</script>
+
+</body>
+</html>

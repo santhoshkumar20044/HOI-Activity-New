@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Monitoring Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- THEME & COLORS --- */
+        :root {
+            --primary-color: #006d77;
+            --secondary-color: #eefcfd;
+            --text-dark: #333;
+            --text-light: #555;
+            --white: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0; padding: 0; min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: #ffffff; border-bottom: 4px solid #004d55; padding: 18px 5%; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            flex-wrap: wrap; gap: 15px;
+        }
+        .logo-left { height: 65px; width: auto; object-fit: contain; }
+        .logo-right { height: 85px; width: auto; object-fit: contain; }
+        .header-right-group { display: flex; align-items: center; gap: 20px; }
+        .header-buttons { display: flex; align-items: center; gap: 12px; }
+        
+        .intervention-btn {
+            padding: 10px 20px; border-radius: 50px; border: 1px solid #ff9800; background: #ffc107; 
+            color: #3e2723; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: transform 0.2s;
+        }
+        .intervention-btn:hover { transform: scale(1.05); }
+
+        .back-btn {
+            padding: 10px 20px; border-radius: 50px; border: 1px solid #e5e7eb; background: #ffffff; 
+            color: #111827; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background-color: #f3f4f6; }
+
+        /* --- MAIN CARD --- */
+        .main-container { display: flex; justify-content: center; padding: 50px 20px; }
+        
+        .card {
+            background: var(--white); width: 100%; max-width: 1000px; /* Increased Width */
+            border-radius: 16px; box-shadow: var(--shadow);
+            padding: 50px; box-sizing: border-box;
+        }
+        
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 28px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 40px; padding-bottom: 15px; border-bottom: 2px solid #f1f5f9; letter-spacing: 1px;
+        }
+        #intervention-page .main-title { color: #d32f2f; border-bottom-color: #d32f2f; }
+
+        /* --- TABS SYSTEM --- */
+        .tabs-container {
+            display: flex; justify-content: center; background-color: #f1f5f9; padding: 6px; 
+            border-radius: 12px; margin-bottom: 45px; width: fit-content; margin-left: auto; margin-right: auto;
+        }
+        .tab-btn {
+            padding: 12px 40px; border: none; background: transparent; font-size: 15px; font-weight: 600; color: #64748b;
+            cursor: pointer; border-radius: 8px; transition: all 0.3s ease;
+        }
+        .tab-btn.active { background-color: var(--primary-color); color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .tab-btn:hover:not(.active) { background-color: #e2e8f0; color: #333; }
+
+        .hidden { display: none !important; }
+
+        /* --- FORM ELEMENTS (SPACIOUS DESIGN) --- */
+        .section-header { 
+            font-size: 18px; color: #1e293b; font-weight: 700; margin-bottom: 25px; margin-top: 30px; 
+            padding-bottom: 10px; border-bottom: 1px dashed #cbd5e1;
+        }
+        
+        /* Grid with more gap */
+        .grid-2 { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 25px; 
+        }
+        
+        .form-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+        
+        .form-group label { 
+            font-weight: 600; font-size: 14px; color: #334155; letter-spacing: 0.3px;
+        }
+        
+        /* Input Styling - Airy */
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 14px 16px; border: 1px solid #cbd5e1; border-radius: 8px; 
+            font-size: 15px; background-color: #ffffff; box-sizing: border-box; transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus { 
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 109, 119, 0.1); 
+        }
+        
+        /* Placeholder styling */
+        ::placeholder { color: #94a3b8; font-size: 14px; }
+
+        /* RADIO BUTTONS (Card Style) */
+        .radio-group { display: flex; gap: 20px; align-items: center; }
+        .radio-label { 
+            display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; 
+            background: #f8fafc; padding: 10px 18px; border: 1px solid #e2e8f0; border-radius: 8px; 
+            transition: all 0.2s; color: #475569;
+        }
+        .radio-label:hover { background-color: #f1f5f9; }
+        .radio-label input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary-color); }
+        
+        .radio-label.selected { 
+            background: #e0f2f1; color: var(--primary-color); font-weight: 700; border-color: var(--primary-color); 
+        }
+
+        /* BUTTONS */
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 15px 50px; border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 700; cursor: pointer; width: 100%; display: block; margin-top: 40px; 
+            text-transform: uppercase; letter-spacing: 1px; transition: background 0.3s;
+        }
+        .btn-submit:hover { background-color: #00565e; }
+        
+        /* CHECKBOX GROUP */
+        .checkbox-container { display: flex; flex-wrap: wrap; gap: 15px; }
+        .checkbox-label { 
+            background: #ffffff; border: 1px solid #cbd5e1; padding: 10px 15px; border-radius: 8px; 
+            font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; color: #334155;
+        }
+        .checkbox-label:hover { border-color: var(--primary-color); }
+        .checkbox-label input { width: 16px; height: 16px; accent-color: var(--primary-color); }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; gap: 20px; }
+            .header-buttons { width: 100%; justify-content: center; margin-top: 10px; }
+            .card { padding: 25px; }
+        }
+        
+        /* HOI Modal styles */
+        .button-group-hoi { display: flex; gap: 15px; margin-top: 25px; }
+        .submit-btn-hoi { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; }
+        .submit-btn-hoi.red { background-color: #d32f2f; }
+        .submit-btn-hoi.grey { background-color: #64748b; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-section"><img src="/public/clg-logo.png" alt="College Logo" class="logo-left" onerror="this.style.display='none'"></div>
+        <div class="header-right-group">
+            <div class="header-buttons">
+                <button type="button" class="intervention-btn" onclick="openInterventionPage()">
+                    <i class="fas fa-exclamation-triangle"></i> HOI Intervention Needed
+                </button>
+                <button type="button" class="back-btn" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+            </div>
+            <img src="/public/aakam-logo.png" alt="Aakam Logo" class="logo-right" onerror="this.style.display='none'">
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="hr-page" class="card">
+            <h1 class="main-title">HR REPORT</h1>
+
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('Daily')">Daily</button>
+                <button class="tab-btn" onclick="switchTab('Monthly')">Monthly</button>
+            </div>
+
+            <form onsubmit="submitForm(event)">
+                
+                <div id="Daily-section">
+                    <div class="section-header"><i class="fas fa-user-clock"></i> Daily Employee Attendance</div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>No. of Absentees - Trust Employees</label>
+                            <input type="number" id="absent_trust" placeholder="Enter count">
+                        </div>
+                        <div class="form-group">
+                            <label>No. of Absentees - Pharmacy</label>
+                            <input type="number" id="absent_pharm" placeholder="Enter count">
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>No. of Absentees - Nursing</label>
+                            <input type="number" id="absent_nursing" placeholder="Enter count">
+                        </div>
+                        <div class="form-group">
+                            <label>No. of Absentees - AHS</label>
+                            <input type="number" id="absent_ahs" placeholder="Enter count">
+                        </div>
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>No. of Absentees - Engineering</label>
+                            <input type="number" id="absent_eng" placeholder="Enter count">
+                        </div>
+                        <div></div> 
+                    </div>
+
+                    <div class="section-header"><i class="fas fa-users-cog"></i> Staff Processes</div>
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Onboarding (New Staff)</label>
+                            <div class="radio-group">
+                                <label class="radio-label"><input type="radio" name="onboarding" value="Completed" onclick="highlightRadio(this)"> Completed</label>
+                                <label class="radio-label"><input type="radio" name="onboarding" value="No Activity" onclick="highlightRadio(this)"> No Activity</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Offboarding (Resigned Staff)</label>
+                            <div class="radio-group">
+                                <label class="radio-label"><input type="radio" name="offboarding" value="Completed" onclick="highlightRadio(this)"> Completed</label>
+                                <label class="radio-label"><input type="radio" name="offboarding" value="No Activity" onclick="highlightRadio(this)"> No Activity</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-header"><i class="fas fa-user-tie"></i> Recruitment Updates</div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>No. of interview candidate count</label>
+                            <input type="number" id="interview_count" placeholder="Enter count">
+                        </div>
+                        <div class="form-group">
+                            <label>Detail review on the candidate</label>
+                            <textarea id="candidate_review" rows="1" placeholder="Enter brief review..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="Monthly-section" class="hidden">
+                    <div class="section-header"><i class="fas fa-file-contract"></i> Monthly Compliance & Docs</div>
+                    
+                    <div class="form-group">
+                        <label style="margin-bottom: 15px; display:block;">Financial & Compliance Bills (Check all that apply)</label>
+                        <div class="checkbox-container">
+                            <label class="checkbox-label"><input type="checkbox" name="financial_bills" value="Acquittance"> Acquittance</label>
+                            <label class="checkbox-label"><input type="checkbox" name="financial_bills" value="EB Bill"> EB Bill</label>
+                            <label class="checkbox-label"><input type="checkbox" name="financial_bills" value="Insurance"> Insurance</label>
+                            <label class="checkbox-label"><input type="checkbox" name="financial_bills" value="Fire Safety"> Fire Safety</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 25px;">
+                        <label>Government Documentation Status</label>
+                        <input type="text" id="govt_docs" placeholder="Enter details about GOs, MoUs status...">
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; border-top: 2px solid #f1f5f9; padding-top: 30px;">
+                    <div class="section-header" style="margin-top: 0;"><i class="fas fa-tasks"></i> Status & Critical Impact</div>
+                    
+                    <div class="form-group">
+                        <label>Status & Impact</label>
+                        <div class="radio-group" style="flex-wrap: wrap;">
+                            <label class="radio-label"><input type="radio" name="impact" value="No Issues" onclick="highlightRadio(this)"> No Issues</label>
+                            <label class="radio-label"><input type="radio" name="impact" value="Minor Delay" onclick="highlightRadio(this)"> Minor Delay</label>
+                            <label class="radio-label"><input type="radio" name="impact" value="High Impact" onclick="highlightRadio(this)"> High Impact</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Submit Report</button>
+            </form>
+        </div>
+
+        <div id="intervention-page" class="card hidden">
+            <h1 class="main-title">🚨 HOI INTERVENTION REQUIRED</h1>
+            <p style="color: #d32f2f; font-weight: 600; text-align: center; margin-bottom: 30px;">
+                Use this form only for critical HR Issues requiring immediate attention.
+            </p>
+            <form onsubmit="submitIntervention(event)">
+                <div class="form-group"><label>Brief Topic:</label><input type="text" id="hoi_topic" required placeholder="e.g., Compliance Deadline Missed"></div>
+                <div class="form-group"><label>Action Required:</label><input type="text" id="hoi_details" style="height: 80px;" required placeholder="Describe what needs to be done"></div>
+                <div class="button-group-hoi">
+                    <button type="submit" class="submit-btn-hoi red">SUBMIT</button>
+                    <button type="button" class="submit-btn-hoi grey" onclick="showMainPage()">CANCEL</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        // TAB LOGIC
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.innerText === tabName);
+            });
+            
+            const daily = document.getElementById('Daily-section');
+            const monthly = document.getElementById('Monthly-section');
+
+            if (tabName === 'Daily') {
+                daily.classList.remove('hidden');
+                monthly.classList.add('hidden');
+            } else {
+                monthly.classList.remove('hidden');
+                daily.classList.add('hidden');
+            }
+        }
+
+        // RADIO HIGHLIGHT
+        function highlightRadio(input) {
+            const name = input.name;
+            document.querySelectorAll(`input[name="${name}"]`).forEach(el => {
+                el.closest('.radio-label').classList.remove('selected');
+            });
+            input.closest('.radio-label').classList.add('selected');
+        }
+
+        // PAGE NAV
+        function openInterventionPage() {
+            document.getElementById('hr-page').classList.add('hidden');
+            document.getElementById('intervention-page').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+        function showMainPage() {
+            document.getElementById('intervention-page').classList.add('hidden');
+            document.getElementById('hr-page').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        // SUBMIT LOGIC
+        async function submitForm(e) {
+            e.preventDefault();
+            
+            const activeTab = document.querySelector('.tab-btn.active').innerText;
+            const getVal = (id) => document.getElementById(id)?.value || '';
+            const getRadio = (name) => document.querySelector(`input[name="${name}"]:checked`)?.value || 'N/A';
+
+            let desc = `Freq: ${activeTab}. `;
+
+            if (activeTab === 'Daily') {
+                desc += `Absentees (T/P/N/A/E): ${getVal('absent_trust')}/${getVal('absent_pharm')}/${getVal('absent_nursing')}/${getVal('absent_ahs')}/${getVal('absent_eng')}. `;
+                desc += `Onboard: ${getRadio('onboarding')}. Offboard: ${getRadio('offboarding')}. `;
+                desc += `Interview Count: ${getVal('interview_count')}. Review: ${getVal('candidate_review')}. `;
+            } else {
+                desc += `Govt Docs: ${getVal('govt_docs')}. `;
+            }
+
+            desc += `Impact: ${getRadio('impact')}.`;
+
+            const payload = {
+                title: "HR Monitoring Report",
+                description: desc,
+                status: 'new',
+                timestamp: new Date()
+            };
+
+            console.log("Submitting:", payload);
+
+            try {
+                const response = await fetch('http://localhost:5000/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert(`✅ ${activeTab} HR Report Submitted Successfully!`);
+                    window.location.reload();
+                } else {
+                    alert("❌ Failed to submit report.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("❌ Server Error: Is backend running?");
+            }
+        }
+
+        function submitIntervention(e) {
+            e.preventDefault();
+            alert("🚨 Urgent HR Report Sent!");
+            showMainPage();
+        }
+    </script>
+</body>
+</html>

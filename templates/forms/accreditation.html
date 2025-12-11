@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accreditations Activity Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES (MATCHING SCREENSHOT AESTHETICS) --- */
+        :root {
+            --primary-color: #006d77; /* Teal Blue */
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --danger-color: crimson;
+            --info-color: #2563eb;
+            --warning-color: #ff9800;
+            --intervention-bg: #ffc107;
+            --intervention-border: #ff9800;
+            --intervention-text: #3e2723;
+            --deep-teal-bg: #005A6F;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: #ffffff;
+            border-bottom: 4px solid #004d55;
+            padding: 15px 5%; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            flex-wrap: wrap; 
+            gap: 15px;
+        }
+
+        .logo-left { height: 60px; width: auto; object-fit: contain; }
+        .logo-right { height: 80px; width: auto; object-fit: contain; }
+        
+        .header-right-group { display: flex; align-items: center; gap: 15px; }
+        .header-buttons { display: flex; align-items: center; gap: 10px; }
+
+        /* BUTTONS */
+        .intervention-btn {
+            padding: 8px 16px; 
+            border-radius: 999px;
+            border: 1px solid var(--intervention-border);
+            background: var(--intervention-bg);
+            color: var(--intervention-text);
+            font-size: 13px; 
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex; align-items: center; gap: 6px;
+        }
+        
+        .back-btn {
+            padding: 8px 16px; 
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #111827;
+            font-size: 13px; 
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex; align-items: center; gap: 5px;
+        }
+
+        /* --- MAIN CARD --- */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            padding: 40px 15px;
+        }
+
+        .card {
+            background: var(--white);
+            width: 100%;
+            max-width: 900px;
+            border-radius: 12px; 
+            box-shadow: var(--shadow); 
+            padding: 40px;
+            box-sizing: border-box;
+        }
+
+        .hidden { display: none; }
+
+        #intervention-page { max-width: 700px; }
+        #intervention-page .main-title { color: #d32f2f; border-bottom-color: #d32f2f; }
+        
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 28px; font-weight: 800;
+            text-transform: uppercase; margin-bottom: 30px; border-bottom: 3px solid #e5e7eb; padding-bottom: 15px;
+        }
+
+        /* --- FORM STRUCTURE --- */
+        .section-box {
+            background: #f9fafb; border: 1px solid #d1d5db; border-radius: 8px; padding: 25px; margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex; align-items: center; gap: 10px; color: var(--primary-color); font-weight: bold; margin-bottom: 20px; font-size: 18px; text-transform: uppercase;
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-group label { 
+            display: block; margin-bottom: 8px; font-weight: 700; font-size: 15px; color: #1f2937;
+        }
+        .form-group input[type="text"], .form-group input[type="file"], .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 15px; box-sizing: border-box; background-color: #fff;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 109, 119, 0.15);
+        }
+
+        .option-container { display: flex; flex-wrap: wrap; gap: 15px; margin-top: 5px; }
+        .checkbox-group { 
+            display: flex; align-items: center; gap: 8px; font-size: 15px; color: #374151; background: #fff; padding: 8px 12px; border: 1px solid #e5e7eb; border-radius: 6px;
+        }
+        .checkbox-group input { width: 18px; height: 18px; accent-color: var(--primary-color); }
+
+        .required-label::after { content: " *"; color: var(--danger-color); font-weight: 700; }
+
+        .submit-container { text-align: center; margin-top: 30px; border-top: 1px solid #eee; padding-top: 25px; }
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 14px 40px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
+        
+        /* HOI BUTTONS */
+        .button-group-hoi { display: flex; gap: 15px; margin-top: 20px; }
+        .submit-btn-hoi { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; text-transform: uppercase; font-size: 14px; }
+        .submit-btn-hoi.red { background-color: #d32f2f; }
+        .submit-btn-hoi.grey { background-color: #78909c; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; padding: 15px; }
+            .header-buttons { width: 100%; justify-content: center; }
+            .card { padding: 20px; }
+            .btn-submit, .submit-btn-hoi { width: 100%; }
+            .button-group-hoi { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-section"><img src="/public/clg-logo.png" alt="Logo Left" class="logo-left"></div>
+        <div class="header-right-group">
+            <div class="header-buttons">
+                <button type="button" class="intervention-btn" onclick="openInterventionPage()">
+                    🚨 HOI Intervention Needed
+                </button>
+                <button type="button" class="back-btn" onclick="history.back()">
+                    ← Back
+                </button>
+            </div>
+            <img src="/public/aakam-logo.png" alt="Logo Right" class="logo-right">
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="accreditations-page" class="card">
+            <h1 class="main-title"><i class="fas fa-certificate" style="margin-right: 10px;"></i> ACCREDITATIONS REPORT</h1>
+
+            <form id="accreditationsForm">
+                
+                <div class="section-box">
+                    <div class="section-header"><i class="fas fa-sitemap"></i> Department & Activity Details</div>
+                    
+                    <div class="form-group">
+                        <label for="department" class="required-label">1. Select Department</label>
+                        <select id="department" name="department" required>
+                            <option value="">Select Department</option>
+                            <option value="CSE">CSE</option>
+                            <option value="ECE">ECE</option>
+                            <option value="EEE">EEE</option>
+                            <option value="Mechanical">Mechanical</option>
+                            <option value="Civil">Civil</option>
+                            <option value="Science & Humanities">Science & Humanities</option>
+                            <option value="Pharmacy">Pharmacy</option>
+                            <option value="MBA">MBA</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required-label">2. Type of activity (Check all that apply)</label>
+                        <div class="option-container">
+                            <div class="checkbox-group"><input type="checkbox" name="activityType" value="NAAC"> <span>NAAC</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="activityType" value="NBA"> <span>NBA</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="activityType" value="ISO"> <span>ISO</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="activityType" value="NIRF"> <span>NIRF</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="activityType" value="QCI"> <span>QCI</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="activityType" value="Other"> <span>Other</span></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required-label">3. Frequency</label>
+                        <div class="option-container">
+                            <div class="checkbox-group"><input type="radio" name="frequency" value="Semester" required> <span>Semester</span></div>
+                            <div class="checkbox-group"><input type="radio" name="frequency" value="Yearly"> <span>Yearly</span></div>
+                            <div class="checkbox-group"><input type="radio" name="frequency" value="Monthly"> <span>Monthly</span></div>
+                            <div class="checkbox-group"><input type="radio" name="frequency" value="Weekly"> <span>Weekly</span></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="purpose" class="required-label">4. Purpose of Activity</label>
+                        <textarea id="purpose" name="purpose" rows="2" required placeholder="Short description..."></textarea>
+                    </div>
+                </div>
+
+                <div class="section-box" style="border-left: 4px solid var(--danger-color);">
+                    <div class="section-header" style="color: var(--danger-color);"><i class="fas fa-exclamation-triangle"></i> Issues & Risks</div>
+
+                    <div class="form-group">
+                        <label>5. Problems Faced (if any)</label>
+                        <div class="option-container">
+                            <div class="checkbox-group"><input type="checkbox" name="problems" value="Delay"> <span>Delay</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="problems" value="Data Missing"> <span>Data Missing</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="problems" value="Manpower Shortage"> <span>Manpower Shortage</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="problems" value="No Issues"> <span>No Issues</span></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="required-label">6. Risk Level</label>
+                        <div class="option-container">
+                            <div class="checkbox-group"><input type="radio" name="riskLevel" value="High Risk"> <span >High Risk</span></div>
+                            <div class="checkbox-group"><input type="radio" name="riskLevel" value="Moderate Risk"> <span>Moderate Risk</span></div>
+                            <div class="checkbox-group"><input type="radio" name="riskLevel" value="Low Risk" checked> <span>Low Risk</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="button" class="btn-submit" onclick="submitAccreditationsReport(event)">Submit Report</button>
+                </div>
+
+            </form>
+        </div>
+
+
+        <div id="intervention-page" class="card hidden">
+            <h1 class="main-title">🚨 HOI INTERVENTION REQUIRED</h1>
+            <p style="color: #d32f2f; font-weight: 600; text-align: center;">For Critical Accreditation Issues Only</p>
+
+            <form onsubmit="submitIntervention(event)">
+                <div class="form-group">
+                    <label>Brief Topic:</label>
+                    <input type="text" id="intervention-topic" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Immediate Action Required:</label>
+                    <textarea id="intervention-details" rows="4" required></textarea>
+                </div>
+
+                  <div class="submit-area">
+          <button type="button" class="btn primary" onclick="submitAcademics(event)">Submit Report</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="inner">
+      <h3>🚨 HOI IMMEDIATE INTERVENTION REQUIRED</h3>
+      <p>Use only for urgent issues requiring HOI action.</p>
+
+      <div style="margin-top:12px">
+        <label for="hoi_topic">Topic</label>
+        <input id="hoi_topic" type="text">
+      </div>
+
+      <div style="margin-top:12px">
+        <label for="hoi_details">Immediate Action Required</label>
+        <textarea id="hoi_details" rows="5"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+        <button class="btn secondary" onclick="closeIntervention()">Cancel</button>
+        <button class="btn primary" onclick="submitIntervention()">Submit to HOI</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Tab list
+  const panels = ['Daily','Weekly','Monthly','Semester','Half','Yearly'];
+  function switchTab(name){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const btn = document.getElementById('tab' + name);
+    if(btn) btn.classList.add('active');
+
+    const titleMap = {
+      Daily:'Daily Report', Weekly:'Weekly Report', Monthly:'Monthly Report',
+      Semester:'Semester Report', Half:'Half-Yearly Report', Yearly:'Yearly Report'
+    };
+    document.getElementById('reportTitle').textContent = titleMap[name] || name;
+
+    panels.forEach(p => {
+      const el = document.getElementById('panel-' + p);
+      if(el) el.style.display = (p === name) ? 'block' : 'none';
+    });
+
+    window.scrollTo({ top: document.querySelector('.card').offsetTop - 10, behavior: 'smooth' });
+  }
+
+  // HOI overlay handlers
+  function openIntervention(){ document.getElementById('overlay').style.display='flex'; document.getElementById('hoi_topic').focus(); }
+  function closeIntervention(){ document.getElementById('overlay').style.display='none'; document.getElementById('hoi_topic').value=''; document.getElementById('hoi_details').value=''; }
+
+  // 🚨 HOI INTERVENTION SUBMISSION LOGIC (Mock/Placeholder)
+  function submitIntervention(){
+    const topic = document.getElementById('hoi_topic').value.trim();
+    const details = document.getElementById('hoi_details').value.trim();
+    if(!topic || !details){ alert('Please fill Topic and Details.'); return; }
+    
+    // In a real application, you would create a separate submission here.
+    const hoiPayload = {
+      form_type: "HOI_INTERVENTION",
+      form_user: SUBMITTER_USER_EMAIL,
+      subject: `HOI Intervention: ${topic}`,
+      topic: topic,
+      details: details,
+    };
+    
+    // Mocking the submission process
+    console.log("🚀 Sending HOI Intervention to Backend (Mock):", hoiPayload);
+    alert('✅ HOI Intervention submitted (mock). A real call would be made here.');
+    closeIntervention();
+  }
+
+  // Helper function to safely get value from ID
+  const val = id => (document.getElementById(id) ? document.getElementById(id).value : '');
+  
+  // Helper to collect all form data fields from the active panel
+  function getAllFormData() {
+      const formData = {};
+      const formElement = document.getElementById('academicsForm');
+      
+      // Get all input, select, textarea elements within the form
+      const elements = formElement.querySelectorAll('input, select, textarea');
+      
+      elements.forEach(el => {
+          // Only collect data from the currently visible panel
+          if (el.closest('.panel') && el.closest('.panel').style.display === 'none') {
+              return; 
+          }
+          
+          if (el.id) {
+              if (el.type === 'checkbox') {
+                  // Handle Checkboxes (group them by name if needed, but here we use ID for specific items)
+                  if (el.checked) {
+                      formData[el.id] = el.value || true;
+                  }
+              } else if (el.type === 'number') {
+                  // Convert number inputs to actual numbers if they have a value
+                   const numberValue = parseFloat(el.value);
+                   formData[el.id] = isNaN(numberValue) ? el.value : numberValue;
+              } else {
+                  // For text, select, textarea
+                  formData[el.id] = el.value.trim();
+              }
+          }
+      });
+      return formData;
+  }
+
+
+  // 🌟 REAL SUBMISSION LOGIC - MODIFIED FOR /api/submit_form
+  function submitAcademics(event) {
+    if(event) event.preventDefault();
+
+    // 1. Determine currently active tab/frequency
+    const activeBtn = document.querySelector('.tab-btn.active');
+    const frequency = activeBtn ? activeBtn.innerText : 'Unknown';
+    const form_type = 'academics.html'; // Matches the filename used in app.py
+
+    // 2. Collect ALL form data (only visible fields will have meaningful content)
+    const formData = getAllFormData();
+
+    // 3. Construct a title and description based on the active tab for the 'subject' field
+    let title = `Academics - ${frequency} Report`;
+    let description = '';
+
+    // Create a meaningful description for the submission record
+    if (frequency === 'Daily') {
+        const scheduled = formData['daily_main_scheduled'] || 0;
+        const conducted = formData['daily_main_conducted'] || 0;
+        const status = formData['daily_status_activity'] || 'N/A';
+        description = `Scheduled: ${scheduled}, Conducted: ${conducted}. Status: ${status}. Remarks: ${formData['daily_main_remarks'].substring(0, 50)}...`;
+    } else if (frequency === 'Weekly') {
+        const scheduled = formData['weekly_main_scheduled'] || 0;
+        const conducted = formData['weekly_main_conducted'] || 0;
+        description = `Weekly Scheduled: ${scheduled}, Conducted: ${conducted}.`;
+    } else if (frequency === 'Semester') {
+        const syllabus = formData['sem_main_syllabus_pct'] || 0;
+        description = `Syllabus Completion: ${syllabus}%.`;
+    } 
+    // Default or other frequencies use the simple title
+    if (!description) {
+        description = title;
+    }
+
+
+    // 4. Final Payload Construction
+    const payload = {
+        // Required by app.py's /api/submit_form
+        form_type: form_type,
+        form_user: SUBMITTER_USER_EMAIL, // Passed from Flask session
+        subject: title, 
+        
+        // All form data is passed under the root level (app.py expects JSON dump of all data)
+        ...formData, 
+        
+        // Add description to the payload for easy reference if needed
+        submission_description: description
+    };
+
+    console.log("🚀 Sending to Backend:", payload);
+    document.querySelector('.submit-area .btn.primary').disabled = true; // Prevent double submission
+
+    fetch('/api/submit_form', { // Use relative path, assuming Flask is running on the same domain
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector('.submit-area .btn.primary').disabled = false;
+        if (data.success) {
+            console.log("✅ Success:", data);
+            alert(`✅ ${frequency} Report Submitted Successfully! Submission ID: ${data.id}. Status: Today Activity.`);
+            // Redirect to the Submitter Dashboard for status tracking
+            window.location.href = '/submitter_dashboard'; 
+        } else {
+            console.error('❌ Backend Error:', data);
+            alert(`Submission Failed! Message: ${data.message || 'Check server logs for details.'}`);
+        }
+    })
+    .catch((error) => {
+        document.querySelector('.submit-area .btn.primary').disabled = false;
+        console.error('❌ Network Error:', error);
+        alert("Network Error! Could not connect to the API. Make sure your Flask server is running.");
+    });
+  }
+
+  // initialize default view
+  (function(){ switchTab('Daily'); })();
+
+  // HOI pill click
+  document.getElementById('hoiPill').addEventListener('click', openIntervention);
+</script>
+</body>
+</html>

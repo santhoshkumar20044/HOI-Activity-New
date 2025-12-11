@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HOI Dashboard Login</title> 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+</head>
+<body>
+<div id="loginPage" class="login-page">
+
+    <video autoplay muted loop id="background-video">
+        <source src="static/videos/your-background-video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="overlay"></div>
+
+    <header class="top-bar">
+        <div class="top-left-logo">
+            <img src="{{ url_for('static', filename='images/clg-logo.png') }}" alt="College Logo" />
+        </div>
+        <div class="top-right-logo">
+            <img src="{{ url_for('static', filename='images/aakam-logo.png') }}" alt="Aakam Logo" />
+        </div>
+    </header>
+
+    <main class="page-main">
+        <div class="glass-card">
+            <div class="logo-area">
+                
+                {% if error %}
+                    <p id="flaskError" style="color: red; font-size: 14px; margin-bottom: 15px;">{{ error }}</p>
+                {% endif %}
+
+                <h2 class="login-title">Unlock Access</h2>
+                <p class="login-subtitle">Sign in with your institution credentials</p>
+
+                <form id="emailForm" action="#" method="POST">
+                    <div class="field-block">
+                        <label class="field-label" for="email">Email Address</label>
+                        <div class="input-group">
+                            <input type="email" id="email" name="email" required placeholder="Enter your official email" />
+                        </div>
+                    </div>
+
+                    <button class="btn-login" type="button" onclick="sendOtp()">Send OTP</button>
+                    <p id="emailError" style="color: red; font-size: 13px; margin-top: 10px;"></p>
+                </form>
+
+                <form id="otpForm" action="/" method="POST" style="display: none;">
+                    <div class="field-block">
+                        <label class="field-label" for="otp">One-Time Password (OTP)</label>
+                        <div class="input-group">
+                            <input type="text" id="otp" name="otp" required placeholder="Enter the 6-digit OTP" maxlength="6" />
+                        </div>
+                    </div>
+                    
+                    <p class="login-subtitle" style="margin-bottom: 20px;">
+                        <span id="otpTimer" style="color: #4CAF50;">OTP expires in 120s</span> 
+                        <button type="button" class="forgot-text-btn" onclick="resendOtp()">Resend?</button>
+                    </p>
+
+                    <input type="hidden" name="email" id="emailForOtpVerification">
+                    
+                    <button class="btn-login" type="submit">Verify & Login</button>
+                    <p id="otpError" style="color: red; font-size: 13px; margin-top: 10px;"></p>
+                </form>
+            </div>
+            
+            <div class="login-extra">
+                <label class="terms-row">
+                    <input type="checkbox" name="terms" required /> <span>I Agree to Terms</span>
+                </label>
+            </div>
+        </div>
+    </main>
+
+    <div class="bottom-bar">
+        <div class="bottom-bar-track">
+            {% for i in range(6) %}
+                <img src="{{ url_for('static', filename='images/clg-inst-logo-roll.svg') }}" alt="Logo" />
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Get all required DOM elements
+    const emailForm = document.getElementById('emailForm');
+    const otpForm = document.getElementById('otpForm');
+    const emailInput = document.getElementById('email');
+    const emailForOtpVerification = document.getElementById('emailForOtpVerification');
+    const otpTimer = document.getElementById('otpTimer');
+    const emailError = document.getElementById('emailError');
+    const otpError = document.getElementById('otpError');
+    const flaskError = document.getElementById('flaskError'); // To check server-side errors
+    
+    let timerInterval;
+    let timeLeft = 120; // 120 seconds for OTP expiry
+    let lastSentEmail = ''; // Store the last successfully sent email
+
+    // --- 1. SEND OTP FUNCTION ---
+    async function sendOtp() {
+        const email = emailInput.value.trim();
+        if (!email || !email.includes('@')) {
+            emailError.textContent = "Please enter a valid email address.";
+            return;
+        }
+        emailError.textContent = "";
+
+        const sendOtpButton = emailForm.querySelector('.btn-login');
+        sendOtpButton.textContent = 'Sending...';
+        sendOtpButton.disabled = true;
+
+        try {
+            const response = await fetch('/api/send_otp', { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // SUCCESS: Switch forms and start timer
+                alert("OTP successfully sent to your email!");
+                emailForm.style.display = 'none';
+                otpForm.style.display = 'block';
+                
+                // Set the email value for OTP verification submission
+                emailForOtpVerification.value = email; 
+                lastSentEmail = email; // Store the email
+                
+                startTimer();
+                otpError.textContent = ''; 
+                if(flaskError) flaskError.style.display = 'none'; // Hide general error if successful
+                
+            } else {
+                // FAILURE: Show error on the email form
+                emailError.textContent = data.message || "Failed to send OTP. Please check your email and try again.";
+            }
+        } catch (error) {
+            emailError.textContent = "Network error or server issue. Try again.";
+            console.error('Error sending OTP:', error);
+        } finally {
+            sendOtpButton.textContent = 'Send OTP';
+            sendOtpButton.disabled = false;
+        }
+    }
+
+    // --- 2. TIMER FUNCTION ---
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval); 
+        
+        timeLeft = 120; // Reset time
+        otpTimer.style.color = '#4CAF50';
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            otpTimer.textContent = `OTP expires in ${timeLeft}s`;
+
+            if (timeLeft <= 30) {
+                otpTimer.style.color = 'red';
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                otpTimer.textContent = "OTP Expired. Please Resend.";
+                otpTimer.style.color = 'red';
+            }
+        }, 1000);
+    }
+
+    // --- 3. RESEND OTP FUNCTION ---
+    function resendOtp() {
+        // Stop the timer and switch back to email form
+        if (timerInterval) clearInterval(timerInterval);
+        
+        otpForm.style.display = 'none';
+        emailForm.style.display = 'block';
+        
+        // Re-run the sendOtp logic (which will auto-resend)
+        sendOtp();
+    }
+
+    // --- 4. INITIALIZATION AND ERROR CHECKING ---
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        // Check if there is a server error message upon page load
+        if (flaskError && flaskError.textContent.trim()) {
+            const errorText = flaskError.textContent.trim();
+            
+            // Check for errors indicating OTP verification failed (Incorrect OTP or Expired)
+            if (errorText.includes('Incorrect OTP') || errorText.includes('OTP expired') || errorText.includes('OTP request missing')) {
+                
+                // This means the user tried to submit the OTP form but failed.
+                // We should show the OTP form again.
+                emailForm.style.display = 'none';
+                otpForm.style.display = 'block';
+                otpError.textContent = errorText; // Display the error specifically in the OTP area
+                
+                // IMPORTANT: Since the form submission failed, the email value is lost from JS, 
+                // but if Flask redirected properly, the 'email' input in the OTP form will have the value.
+                // Assuming Flask keeps the email value in the hidden input on failed POST redirect, 
+                // but if not, user has to re-enter email or re-request OTP. 
+                // For safety, we stop the timer and prompt resend.
+                
+                if (timerInterval) clearInterval(timerInterval);
+                otpTimer.textContent = "Please click 'Resend' to get a new OTP.";
+                otpTimer.style.color = 'red';
+                
+            } else {
+                // General errors (e.g., Email not registered) -> keep email form visible.
+                emailForm.style.display = 'block';
+                otpForm.style.display = 'none';
+                emailError.textContent = errorText;
+            }
+        } else {
+             // No error on load, show only the email form
+             emailForm.style.display = 'block';
+             otpForm.style.display = 'none';
+        }
+    });
+
+
+    // Expose functions to the global window object
+    window.sendOtp = sendOtp;
+    window.resendOtp = resendOtp;
+</script>
+
+</body>
+</html>

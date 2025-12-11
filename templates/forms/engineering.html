@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ENGINEERING REPORT</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root{
+      --page-teal:#006d77;
+      --teal-dark:#0b6b6a;
+      --card-bg:#ffffff;
+      --soft-bg:#f3f6f6;
+      --muted:#6b7280;
+      --danger:#d32f2f;
+      --card-shadow:0 14px 40px rgba(3,15,15,0.12);
+    }
+
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Segoe UI",sans-serif;background:var(--page-teal);}
+
+    /* HEADER */
+    .topbar{
+      background:#fff;padding:14px 32px;
+      display:flex;align-items:center;justify-content:space-between;
+      box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    }
+    .brand-left img{height:56px}
+    .brand-right{display:flex;align-items:center;gap:12px}
+    .pill{background:linear-gradient(180deg,#ffd966,#ffca28);padding:8px 14px;border-radius:999px;font-weight:800;color:#5a3f00;display:flex;align-items:center;gap:8px;cursor:pointer}
+    .back-btn{padding:8px 12px;border-radius:999px;border:1px solid #e6eef0;background:#fff;cursor:pointer}
+
+    /* CARD */
+    .page{padding:40px 20px}
+    .card{
+      max-width:900px;margin:0 auto;background:#fff;border-radius:16px;
+      padding:42px 48px;box-shadow:var(--card-shadow);
+    }
+    .title{text-align:center;margin-bottom:8px}
+    .title h1{font-size:30px;color:var(--teal-dark);font-weight:900;margin:0}
+
+    /* SECTION */
+    .section{background:#fbfffe;border:1px solid #e6f1f1;margin-bottom:18px;padding:20px;border-radius:14px}
+    .heading{font-weight:900;color:var(--teal-dark);margin-bottom:12px;display:flex;gap:10px;align-items:center}
+    .heading i{background:#e8f6f6;padding:10px;border-radius:8px;color:var(--teal-dark)}
+
+    label{font-weight:700;margin-bottom:6px;display:block;color:#114}
+    input[type="text"],textarea,select{
+      width:100%;padding:10px;border-radius:10px;border:1px solid #e6eef0;
+    }
+    textarea{min-height:70px}
+
+    .checkbox-group{display:flex;flex-direction:column;gap:8px}
+    .checkbox-row{display:flex;align-items:center;gap:8px;font-weight:600}
+
+    .grid{display:grid;gap:14px}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
+
+    .submit-area{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;padding-top:20px;border-top:1px dashed #d6e5e5}
+    .btn{padding:12px 22px;border-radius:10px;border:0;font-weight:900;cursor:pointer}
+    .btn.primary{background:var(--teal-dark);color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #ccc}
+
+    /* OVERLAY */
+    .overlay{
+      position:fixed;inset:0;background:rgba(0,0,0,0.35);
+      display:none;align-items:center;justify-content:center;
+    }
+    .overlay .inner{
+      background:#fff;padding:20px;border-radius:12px;width:600px;max-width:95%;
+    }
+    .overlay h3{margin:0;font-size:22px;color:#b20000;font-weight:900}
+  </style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header class="topbar">
+  <div class="brand-left">
+    <img src="/public/college logos/engineering-logo.svg" alt="College Logo" onerror="this.style.display='none'">
+  </div>
+
+  <div class="brand-right">
+    <div class="pill" id="hoiPill">
+      <i class="fas fa-exclamation-circle"></i> HOI Intervention
+    </div>
+    <button class="back-btn" onclick="history.back()">← Back</button>
+    <img src="/public/aakam-logo.png" alt="Aakam 360" style="height:56px" onerror="this.style.display='none'">
+  </div>
+</header>
+
+
+<!-- PAGE -->
+<div class="page">
+  <div class="card">
+
+    <div class="title"><h1>ENGINEERING REPORT</h1></div>
+
+    <form id="engForm">
+
+      <!-- EVENTS / WATER / ATTENDANCE SECTION -->
+      <div class="section">
+        <div class="heading"><i class="fas fa-list-check"></i> DAILY ENGINEERING CHECKLIST</div>
+
+        <div class="grid grid-2">
+          <div>
+            <label>Events Planned (Tomorrow) *</label>
+            <input type="text" id="ev_tomorrow">
+          </div>
+
+          <div>
+            <label>Attendance (Biometric) *</label>
+            <input type="text" id="attendance">
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-top:12px">
+          <div>
+            <label>RO Water Availability *</label>
+            <select id="ro_water"><option>Available</option><option>Not Available</option></select>
+          </div>
+
+          <div>
+            <label>Bore Water Availability *</label>
+            <select id="bore_water"><option>Available</option><option>Not Available</option></select>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label>Student Complaints (If Any)</label>
+          <textarea id="std_complaints"></textarea>
+        </div>
+      </div>
+
+
+      <!-- STATUS -->
+      <div class="section">
+        <div class="heading"><i class="fas fa-info-circle"></i> STATUS OF TODAY'S ACTIVITIES</div>
+
+        <label>Completion / Critical Impact *</label>
+        <select id="completion">
+          <option>Completed</option>
+          <option>Partially Completed</option>
+          <option>Not Completed</option>
+        </select>
+
+        <div style="height:15px"></div>
+
+        <label>Impact Level *</label>
+        <select id="impact">
+          <option>No Impact</option>
+          <option>Minor Impact</option>
+          <option>Moderate Impact</option>
+          <option>High Impact</option>
+        </select>
+      </div>
+
+
+      <!-- ISSUES -->
+      <div class="section">
+        <div class="heading"><i class="fas fa-exclamation-triangle"></i> ISSUES IDENTIFIED TODAY</div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-row"><input id="iss_ro" type="checkbox"> RO water unavailable</label>
+          <label class="checkbox-row"><input id="iss_bore" type="checkbox"> Bore water unavailable</label>
+          <label class="checkbox-row"><input id="iss_event" type="checkbox"> Event preparation delay</label>
+          <label class="checkbox-row"><input id="iss_att" type="checkbox"> Attendance mismatch / biometric issue</label>
+          <label class="checkbox-row"><input id="iss_stud" type="checkbox"> Student complaints unresolved</label>
+          <label class="checkbox-row"><input id="iss_safe" type="checkbox"> Safety / hygiene concern</label>
+          <label class="checkbox-row"><input id="iss_none" type="checkbox"> No issues</label>
+        </div>
+      </div>
+
+
+      <!-- WASTE -->
+
+
+      <!-- KPI -->
+      <div class="section">
+        <div class="heading"><i class="fas fa-chart-line"></i> KPI & RISK</div>
+
+        <label>KPI Status</label>
+        <div class="checkbox-group">
+          <label class="checkbox-row"><input id="kpi_att" type="checkbox"> Attendance accurate</label>
+          <label class="checkbox-row"><input id="kpi_compl" type="checkbox"> Complaints resolved</label>
+          <label class="checkbox-row"><input id="kpi_event" type="checkbox"> Event plan ready</label>
+          <label class="checkbox-row"><input id="kpi_water" type="checkbox"> Water supply stable</label>
+          <label class="checkbox-row"><input id="kpi_not" type="checkbox"> KPI not achieved</label>
+        </div>
+
+      </div>
+
+
+      <!-- SUBMIT BUTTONS -->
+      <div class="submit-area">
+        <button type="button" class="btn primary" onclick="submitEngineering()">Submit Report</button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+
+<!-- HOI POPUP -->
+<div id="overlay" class="overlay">
+  <div class="inner">
+    <h3>🚨 HOI IMMEDIATE INTERVENTION</h3>
+
+    <label>Topic</label>
+    <input id="hoi_topic" type="text">
+
+    <label style="margin-top:12px">Immediate Action Required</label>
+    <textarea id="hoi_details" rows="4"></textarea>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:18px">
+      <button class="btn secondary" onclick="closeIntervention()">Cancel</button>
+      <button class="btn primary" onclick="submitIntervention()">Submit to HOI</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- JAVASCRIPT -->
+<script>
+
+document.getElementById("hoiPill").addEventListener("click",openIntervention);
+
+function openIntervention(){ document.getElementById("overlay").style.display="flex"; }
+function closeIntervention(){ document.getElementById("overlay").style.display="none"; }
+
+function submitIntervention(){
+  alert("🚨 HOI Support Request Submitted (mock)");
+  closeIntervention();
+}
+
+function collect(ids){
+  return ids.map(id=>{
+    let el=document.getElementById(id);
+    return el && el.checked ? el.parentElement.textContent.trim() : null;
+  }).filter(Boolean);
+}
+
+// ... (mela irukka matha code apdiye irukkattum)
+
+async function submitEngineering(){
+  const v = id => document.getElementById(id)?.value;
+
+  // 1. Data-va collect panrom
+  const payload = {
+    title: "Engineering Report", 
+    description: `Issues: ${collect(["iss_ro","iss_bore","iss_event"]).join(", ") || "None"}`,
+    
+    // Unoda matha data ellam inga irukku
+    submitted_at: new Date().toISOString(),
+    events_tomorrow: v("ev_tomorrow"),
+    attendance: v("attendance"),
+    ro_water: v("ro_water"),
+    bore_water: v("bore_water"),
+    complaints: v("std_complaints"),
+    completion: v("completion"),
+    impact: v("impact")
+  };
+
+  try {
+    // 2. Server-ku data send panrom
+    const response = await fetch('http://localhost:5000/api/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (response.ok) {
+      alert("✔ Report Submitted & Sent to Dashboard!");
+      window.location.reload(); // Success aana page refresh aagum
+    } else {
+      alert("❌ Error submitting form");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    alert("❌ Server connection failed. Is the backend running?");
+  }
+}
+
+// ... (keela irukka matha code apdiye irukkattum)
+
+</script>
+
+</body>
+</html>

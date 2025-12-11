@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HOI Dashboard - Action Monitoring</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        /* Custom Styles for Dashboard */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f9; /* Light, stable background */
+            margin: 0;
+            padding: 0;
+            overflow: hidden; 
+        }
+        
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden; 
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px; /* Slightly wider sidebar */
+            background-color: #1e3a8a; /* Dark Blue */
+            color: white;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px; 
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar a {
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .sidebar a:hover, .sidebar a.bg-blue-800 { 
+            background: #254d9c; 
+            color: white;
+        }
+        
+        /* Main Content Area */
+        .main-content-wrapper {
+            flex-grow: 1;
+            overflow-y: auto; 
+            padding-bottom: 20px;
+        }
+
+        .main-header {
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .content-area {
+            min-height: calc(100vh - 70px); 
+            padding-bottom: 20px; 
+        }
+
+        /* Chatbot Typing Indicator */
+        .dot-flashing {
+          position: relative;
+          width: 5px;
+          height: 5px;
+          border-radius: 5px;
+          background-color: #3b82f6;
+          color: #3b82f6;
+          animation: dotFlashing 1s infinite linear alternate;
+          animation-delay: 0.5s;
+        }
+        .dot-flashing::before, .dot-flashing::after {
+          content: '';
+          display: inline-block;
+          position: absolute;
+          top: 0;
+          width: 5px;
+          height: 5px;
+          border-radius: 5px;
+          background-color: #3b82f6;
+          color: #3b82f6;
+          animation: dotFlashing 1s infinite linear alternate;
+        }
+        .dot-flashing::before { left: -8px; animation-delay: 0s; }
+        .dot-flashing::after { left: 8px; animation-delay: 1s; }
+        @keyframes dotFlashing {
+          0% { background-color: #3b82f6; }
+          50%, 100% { background-color: #d1d5db; }
+        }
+        #chatbotMessages {
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap; 
+            word-wrap: break-word;
+        }
+        
+        /* Custom style for Forms List buttons - ensures full width between elements */
+        .forms-list-item-content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="dashboard-container">
+    
+    <aside class="sidebar h-full">
+        <div class="p-4 border-b border-indigo-500 mb-6">
+            <img src="{{ url_for('static', filename='images/clg-logo.png') }}" alt="College Logo" class="h-10 mx-auto mb-2"/>
+            <h1 class="text-xl font-bold text-center text-white tracking-wider">HOI PANEL</h1>
+        </div>
+        <nav class="flex-grow px-4 space-y-2 text-gray-200">
+            <a href="#" id="nav-activity" onclick="switchSection('activity')" class="active flex items-center p-3 rounded-lg text-sm transition duration-150 bg-blue-800 text-white">
+                <span class="material-icons mr-3 text-lg">dashboard</span>Action Overview
+            </a>
+            <a href="#" id="nav-approvals" onclick="switchSection('approvals')" class="flex items-center p-3 rounded-lg text-sm transition duration-150 text-white">
+                <span class="material-icons mr-3 text-lg">pending_actions</span>Pending Approvals
+            </a>
+            <a href="#" id="nav-approved_activity" onclick="switchSection('approved_activity')" class="flex items-center p-3 rounded-lg text-sm transition duration-150 text-white">
+                <span class="material-icons mr-3 text-lg">check_circle</span>Approved History
+            </a>
+            <a href="#" id="nav-alerts" onclick="switchSection('alerts')" class="flex items-center p-3 rounded-lg text-sm transition duration-150 text-white">
+                <span class="material-icons mr-3 text-lg">notification_important</span>Alarming Attentions
+            </a>
+            
+            <hr class="border-indigo-500 border-opacity-50 my-4">
+            
+            <a href="#" id="nav-reports" onclick="switchSection('reports')" class="flex items-center p-3 rounded-lg text-sm transition duration-150 text-white">
+                <span class="material-icons mr-3 text-lg">analytics</span>Reports
+                
+
+            <a href="#" id="nav-settings" onclick="switchSection('settings')" class="flex items-center p-3 rounded-lg text-sm transition duration-150 text-white">
+                <span class="material-icons mr-3 text-lg">settings</span>Settings
+            </a>
+        </nav>
+        
+        <div class="p-4 border-t border-indigo-500 mt-auto">
+            <div class="bg-white p-3 rounded-xl shadow-lg border-l-4 border-red-600">
+                <p class="text-xs font-medium text-gray-700 mb-1 truncate">{{ session.get('user', 'Guest') }}</p>
+                <a href="/logout" class="flex items-center p-2 rounded-lg text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition duration-150 w-full justify-center">
+                    <span class="material-icons mr-2 text-lg">logout</span>
+                    Logout
+                </a>
+            </div>
+        </div>
+        
+        <div class="p-4 text-xs text-gray-300 border-t border-indigo-500">
+            <p>Status: Online</p>
+            <p>Current Date: <span id="todayDate">Loading...</span></p>
+        </div>
+    </aside>
+
+    <div class="main-content-wrapper flex flex-col pt-4">
+        <header class="main-header p-4 flex justify-between items-center mx-6 rounded-lg shadow-md">
+            <div>
+                <h2 id="pageTitle" class="text-3xl font-bold text-gray-800">Action Monitoring Dashboard</h2>
+                <p id="pageSubtitle" class="text-sm text-gray-500">Overview of all submitted forms and quick summary</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="material-icons text-gray-600 cursor-pointer hover:text-gray-900">settings</span>
+                <div class="h-10 w-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-xl">{{ session.get('user', 'G')[0] | upper }}</div>
+            </div>
+        </header>
+
+        <main class="p-6 flex-grow content-area">
+            
+            <div id="chartAndSummary" class="grid grid-cols-1 lg:grid-cols-5 xl:grid-cols-5 gap-6 mb-6">
+                <div id="summaryCardsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:col-span-4 xl:col-span-4 gap-6">
+                    <div onclick="switchSection('activity')" class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-blue-500 hover:shadow-xl transition duration-150 cursor-pointer">
+                        <p class="text-sm font-medium text-gray-500">Forms in Activity</p>
+                        <p id="totalActivity" class="text-3xl font-bold text-blue-600 mt-1">0</p>
+                        <p class="text-xs text-gray-400 mt-2">Forms submitted in the last 24 hours</p>
+                    </div>
+                    <div onclick="switchSection('approvals')" class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 hover:shadow-xl transition duration-150 cursor-pointer">
+                        <p class="text-sm font-medium text-gray-500">Pending Approvals</p>
+                        <p id="totalPending" class="text-3xl font-bold text-yellow-600 mt-1">0</p>
+                        <p class="text-xs text-gray-400 mt-2">Forms awaiting your action (Overdue)</p>
+                    </div>
+                    <div onclick="switchSection('approved_activity')" class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-green-500 hover:shadow-xl transition duration-150 cursor-pointer">
+                        <p class="text-sm font-medium text-gray-500">Approved Today</p>
+                        <p id="totalApproved" class="text-3xl font-bold text-green-600 mt-1">0</p>
+                        <p class="text-xs text-gray-400 mt-2">Total submissions approved today</p>
+                    </div>
+                    <div onclick="switchSection('alerts')" class="bg-white p-6 rounded-xl shadow-lg border-l-4 border-red-500 hover:shadow-xl transition duration-150 cursor-pointer">
+                        <p class="text-sm font-medium text-gray-500">Active Alerts</p>
+                        <p id="totalAlerts" class="text-3xl font-bold text-red-600 mt-1">0</p>
+                        <p class="text-xs text-gray-400 mt-2">Critical records flagged for HOI Intervention</p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1 xl:col-span-1 bg-white p-4 rounded-xl shadow-lg flex flex-col items-center">
+                    <h5 class="text-lg font-semibold text-gray-700 mb-2">Overall Status</h5>
+                    <div class="h-40 w-full flex items-center justify-center">
+                        <canvas id="statusPieChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-gray-500 mt-2">Activity and Processed forms excluded.</p>
+                </div>
+            </div>
+
+            <div id="mainContent" class="space-y-6">
+                <div class="text-center py-20 text-gray-500">Loading dashboard data...</div>
+            </div>
+        </main>
+    </div>
+    
+    <button onclick="toggleChatbot()" class="fixed bottom-6 right-6 bg-indigo-600 text-white rounded-full p-4 shadow-xl hover:bg-indigo-700 transition duration-300 z-30">
+        <span class="material-icons text-2xl">support_agent</span>
+    </button>
+
+    <div id="chatbotWindow" class="fixed bottom-20 right-6 w-80 h-96 bg-white rounded-lg shadow-2xl flex flex-col hidden z-40 border border-gray-300">
+        <div class="p-3 bg-indigo-600 text-white font-semibold rounded-t-lg flex justify-between items-center">
+            <span>HOI Assistant</span>
+            <button onclick="toggleChatbot()" class="text-white hover:text-gray-200"><span class="material-icons text-lg">close</span></button>
+        </div>
+        <div id="chatbotMessages" class="flex-grow p-3 space-y-3 overflow-y-auto">
+            </div>
+        <div class="p-3 border-t border-gray-200 flex">
+            <input type="text" id="chatbotInput" placeholder="Ask about summary, logs..." class="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+            <button onclick="sendMessage()" class="bg-indigo-600 text-white p-2 rounded-r-lg hover:bg-indigo-700 transition duration-150">
+                <span class="material-icons text-xl">send</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="approvalModalOverlay" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 relative">
+        
+        <button onclick="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-800"><span class="material-icons">close</span></button>
+        
+        <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-2 border-b pb-2">Review Submission</h3>
+        <p id="modalUser" class="text-sm text-gray-500 mb-4"></p>
+        
+        <div id="submissionDetails" class="bg-gray-50 p-4 rounded-lg border max-h-96 overflow-y-auto space-y-2 mb-4 text-sm">
+            Loading details...
+        </div>
+
+        <div class="mb-4">
+            <label for="remarksBox" class="block text-sm font-medium text-gray-700 mb-1">HOI Remarks / Action Notes (Mandatory for Reject/Alert):</label>
+            <textarea id="remarksBox" rows="3" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+        </div>
+
+        <div class="flex space-x-4">
+            <button id="approveBtn" onclick="processSubmission('approved')" class="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-150 flex items-center justify-center">
+                <span class="material-icons text-base mr-1 align-middle">done</span> Approve
+            </button>
+            <button id="rejectBtn" onclick="processSubmission('disapproved')" class="flex-1 bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition duration-150 flex items-center justify-center">
+                <span class="material-icons text-base mr-1 align-middle">close</span> Disapprove
+            </button>
+            <button id="alertBtn" onclick="processSubmission('alert')" class="flex-1 bg-yellow-600 text-white py-2 rounded-lg font-semibold hover:bg-yellow-700 transition duration-150 flex items-center justify-center">
+                <span class="material-icons text-base mr-1 align-middle">warning</span> Flag as ALERT
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- DATA STATE AND CONSTANTS ---
+ // --- DATA STATE AND CONSTANTS ---
+let submissions = []; 
+let activeSection = 'activity';
+let currentSubmissionId = null;
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const ONE_WEEK_MS = 7 * ONE_DAY_MS;
+const ONE_MONTH_MS = 30 * ONE_DAY_MS;    // Approximate 30 days
+const BI_MONTHLY_MS = 60 * ONE_DAY_MS; // Approximate 60 days (Bi-Monthly)
+const SEMESTER_MS = 182 * ONE_DAY_MS;   // Approximate 6 months (Semester)
+const ONE_YEAR_MS = 365 * ONE_DAY_MS;    // Approximate 1 year
+let statusPieChartInstance = null; // To hold the Chart.js instance
+// ... rest of the code
+    
+    // Get the user's email ID from the session variable (available globally)
+    const USER_EMAIL = "{{ session.get('user', 'guest@example.com') }}";
+
+    // This list should match the form filenames you create in templates/forms/
+    const FORM_TEMPLATES = [
+        'academics.html', 'accounts.html', 'accreditation.html', 'admission.html', 'affiliations.html',
+        'ahs.html', 'boys_hostel.html', 'branding_marketing.html', 'budget.html', 'engineering.html',
+        'event_management.html', 'girls_hostel.html', 'guestservice.html', 'Hr.html', 
+        'incubation.html', 'infra_operation.html', 'It_Infra.html', 'mess_management.html',
+        'new_institution.html', 'nursing.html', 'pharmacy.html', 'placement.html', 'purchase.html',
+        'research.html', 'safety.html', 'security.html', 'transport.html'
+    ];
+    
+    // Expose functions to the global window object
+    window.switchSection = switchSection;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.processSubmission = processSubmission;
+    window.toggleChatbot = toggleChatbot;
+    window.sendMessage = sendMessage;
+    window.renderFilteredReports = renderFilteredReports; 
+    
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        fetchSubmissions().then(() => {
+            updateSummaryCards(); 
+            updateStatusPieChart(); 
+            switchSection('activity');
+        });
+        
+        document.getElementById('chatbotInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+                e.preventDefault(); 
+            }
+        });
+        
+        appendMessage("Hello! I'm the HOI Assistant. I can check live dashboard status. Try typing 'summary' or 'recent logs'.", 'assistant');
+    });
+
+    // --- DASHBOARD CORE FUNCTIONS ---
+    
+    /** Fetches submissions and updates the status based on the 24-hour rule. */
+    async function fetchSubmissions() {
+        try {
+            const response = await fetch('/api/submissions');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            
+            const now = Date.now();
+            
+            submissions = data.map(s => {
+                const submittedAtMs = s.submittedAt * 1000;
+                const approvedAtMs = s.approvedAt ? s.approvedAt * 1000 : null;
+                
+                let currentStatus = s.status;
+                
+                // If status is 'activity' and over 24 hours, change to 'pending'
+                if (currentStatus === 'activity' && (now - submittedAtMs) >= ONE_DAY_MS) {
+                    currentStatus = 'pending'; 
+                } else if (currentStatus === 'activity' && (now - submittedAtMs) < ONE_DAY_MS) {
+                    currentStatus = 'activity'; 
+                }
+
+                return {
+                    ...s,
+                    submittedAt: submittedAtMs, 
+                    approvedAt: approvedAtMs,
+                    status: currentStatus 
+                };
+            });
+            
+            updateSummaryCards();
+            updateStatusPieChart(); 
+        } catch (error) {
+            console.error("Error fetching submissions:", error);
+            if (submissions.length === 0) {
+                 document.getElementById('mainContent').innerHTML = `<div class="text-center py-20 text-red-500">Error loading data. Check server console: ${error.message}</div>`;
+            }
+        }
+    }
+
+    /** Updates the summary cards based on current data. */
+    function updateSummaryCards() {
+        const now = Date.now(); 
+        
+        const totalPending = submissions.filter(s => s.status === 'pending').length;
+        
+        const totalApprovedToday = submissions.filter(s => 
+            s.status === 'approved' && 
+            s.approvedAt && 
+            (now - s.approvedAt) < ONE_DAY_MS
+        ).length;
+
+        const totalAlerts = submissions.filter(s => s.status === 'alert').length;
+        const totalActivity = submissions.filter(s => s.status === 'activity').length;
+        
+        if (document.getElementById('totalPending')) document.getElementById('totalPending').textContent = totalPending;
+        if (document.getElementById('totalApproved')) document.getElementById('totalApproved').textContent = totalApprovedToday;
+        if (document.getElementById('totalAlerts')) document.getElementById('totalAlerts').textContent = totalAlerts;
+        if (document.getElementById('totalActivity')) document.getElementById('totalActivity').textContent = totalActivity;
+        
+        return { totalPending, totalApprovedToday, totalAlerts, totalActivity };
+    }
+    
+    /** Updates the status pie chart. */
+    function updateStatusPieChart() {
+        const { totalPending, totalAlerts } = updateSummaryCards();
+        const totalProcessed = submissions.filter(s => s.status === 'approved' || s.status === 'disapproved').length;
+        
+        const chartData = {
+            pending: totalPending,
+            alerts: totalAlerts,
+            approved: totalProcessed
+        };
+        
+        const ctx = document.getElementById('statusPieChart');
+
+        if (!ctx) return; 
+        
+        if (statusPieChartInstance) {
+            statusPieChartInstance.data.datasets[0].data = [chartData.pending, chartData.alerts, chartData.approved];
+            statusPieChartInstance.update();
+            return;
+        }
+
+        // Initialize chart if it doesn't exist
+        statusPieChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Pending', 'Alerts', 'Processed (Approved/Rejected)'],
+                datasets: [{
+                    data: [chartData.pending, chartData.alerts, chartData.approved],
+                    backgroundColor: [
+                        '#FCD34D', // Yellow for Pending
+                        '#F87171', // Red for Alerts
+                        '#34D399'  // Green for Processed
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 10,
+                            padding: 10,
+                            color: '#4B5563', // gray-600
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed;
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /** Switches the main content section and updates the sidebar navigation. */
+    async function switchSection(sectionName) {
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.classList.remove('bg-blue-800');
+        });
+        const newNav = document.getElementById(`nav-${sectionName}`);
+        if(newNav) newNav.classList.add('bg-blue-800');
+
+        const titleMap = {
+            'activity': { title: 'Action Monitoring Dashboard', subtitle: "Forms submitted today and quick summary" },
+            'approvals': { title: 'Pending Approvals', subtitle: 'Forms awaiting your review (Overdue)' },
+            'approved_activity': { title: 'Approved/Disapproved History', subtitle: 'List of all processed submissions' },
+            'alerts': { title: 'Alarming Attentions', subtitle: 'Critical records and flags' },
+            'forms_list': { title: 'Forms List (Action Tables)', subtitle: 'Click to open and fill a form' },
+            'reports': { title: 'Reports & Analytics', subtitle: 'Detailed historical data and trends' },
+            'settings': { title: 'Settings', subtitle: 'Manage profile and dashboard preferences' }
+        };
+        const titles = titleMap[sectionName] || titleMap['activity'];
+        document.getElementById('pageTitle').textContent = titles.title;
+        document.getElementById('pageSubtitle').textContent = titles.subtitle;
+
+        const mainContent = document.getElementById('mainContent');
+        mainContent.innerHTML = '<div class="bg-white p-6 rounded-xl shadow-lg text-center py-20 text-gray-500">Loading section data...</div>'; 
+        
+        activeSection = sectionName; 
+
+        await fetchSubmissions(); 
+        const summaryData = updateSummaryCards(); 
+        
+        // Hide summary cards when not in 'activity' section for a cleaner look
+        document.getElementById('chartAndSummary').classList.toggle('hidden', sectionName !== 'activity');
+
+        if (sectionName === 'activity') {
+            renderActivitySection(mainContent, summaryData);
+        } else if (sectionName === 'approvals') {
+            renderListSection(mainContent, 'Pending Approvals', ['pending']);
+        } else if (sectionName === 'approved_activity') {
+            renderListSection(mainContent, 'Approved/Disapproved History', ['approved', 'disapproved']);
+        } else if (sectionName === 'alerts') {
+            renderListSection(mainContent, 'Alarming Attentions', ['alert']);
+        } else if (sectionName === 'forms_list') {
+            renderFormsListSection(mainContent);
+        } else if (sectionName === 'reports') {
+             renderReportsSection(mainContent); 
+        } else if (sectionName === 'settings') {
+             renderSettingsSection(mainContent); 
+        }
+    }
+    
+    /** Renders the main Dashboard (Today Activity) section as a neat table. */
+    function renderActivitySection(mainContent, summaryData) {
+        // Activity status is defined as submission in the last 24 hours AND status is 'activity'
+        const formsInActivity = submissions.filter(s => s.status === 'activity') 
+                                           .sort((a, b) => b.submittedAt - a.submittedAt);
+
+        const tableRows = formsInActivity.length > 0
+            ? formsInActivity.map(s => `
+                <tr onclick="openModal('${s.form}', '${s.user}', '${s.id}', '${s.subject}')" class="border-b hover:bg-gray-50 cursor-pointer">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${s.form}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate">${s.subject}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.user}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-blue-600 font-semibold">
+                        ${s.status.toUpperCase()}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(s.submittedAt).toLocaleTimeString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <span class="text-indigo-600 hover:text-indigo-900">REVIEW</span>
+                    </td>
+                </tr>
+            `).join('')
+            : `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 text-base">No new submissions in the "Activity" window (last 24 hours).</td></tr>`;
+        
+        mainContent.innerHTML = `
+            <div id="activityForms" class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-4 border-b pb-3">
+                    <h5 class="font-semibold text-xl text-gray-800">Recent Submissions (Currently in "Activity" Status)</h5>
+                    <button onclick="switchSection('approvals')" class="text-sm text-blue-700 hover:underline font-medium">View All Pending</button>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject/Title</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted By</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
+                                <th scope="col" class="relative px-6 py-3"><span class="sr-only">Action</span></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+    
+    /** Renders a list view for Pending, Approved, or Alerts. */
+    function renderListSection(mainContent, title, statusFilters) {
+        const filteredSubmissions = submissions.filter(s => statusFilters.includes(s.status))
+                                            .sort((a, b) => b.submittedAt - a.submittedAt);
+
+        const listItems = filteredSubmissions.length > 0
+            ? filteredSubmissions.map(s => {
+                const statusColor = s.status === 'pending' ? 'text-yellow-600' : 
+                                    s.status === 'approved' ? 'text-green-600' : 
+                                    s.status === 'disapproved' ? 'text-red-600' : 
+                                    s.status === 'alert' ? 'text-red-800 font-bold' : 'text-gray-500';
+                                    
+                const actionButtonText = s.status === 'pending' || s.status === 'activity' || s.status === 'alert' ? 'Review/Action' : 'View Details';
+                const dateDisplay = s.approvedAt 
+                    ? `<span class="text-xs text-gray-500">Processed: ${new Date(s.approvedAt).toLocaleString()}</span>`
+                    : `<span class="text-xs text-gray-500">Submitted: ${new Date(s.submittedAt).toLocaleString()}</span>`;
+                    
+                return `
+                    <div onclick="openModal('${s.form}', '${s.user}', '${s.id}', '${s.subject}')" class="p-3 border-b border-gray-100 flex justify-between items-center hover:bg-gray-50 transition duration-100 cursor-pointer">
+                        <div class="w-2/5">
+                            <span class="font-medium text-gray-800">${s.form} - ${s.subject}</span>
+                        </div>
+                        <div class="w-1/5">
+                             <span class="text-sm text-gray-500">By: ${s.user}</span>
+                        </div>
+                        <div class="w-1/5">
+                             <span class="text-sm ${statusColor}">${s.status.toUpperCase()}</span>
+                        </div>
+                        <div class="w-1/5 flex justify-end items-center space-x-3">
+                            ${dateDisplay}
+                            <span class="text-blue-700 font-medium">${actionButtonText}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('')
+            : `<p class="text-center py-4 text-gray-500">No ${title.toLowerCase()} items found.</p>`;
+        
+        mainContent.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h4 class="text-xl font-semibold text-gray-800 mb-4">${title} (${filteredSubmissions.length})</h4>
+                <div class="space-y-1 text-sm text-gray-700">
+                    ${listItems}
+                </div>
+            </div>
+        `;
+    }
+    
+    /** Renders the list of available forms with consistent button size and alignment. */
+    function renderFormsListSection(mainContent) {
+        const formListHtml = FORM_TEMPLATES.map(filename => {
+            const formType = filename.replace('.html', '').replace(/_/g, ' ').toUpperCase();
+            return `
+                <div class="p-4 bg-gray-50 border rounded-lg flex items-center hover:bg-blue-50 transition duration-150">
+                    <div class="forms-list-item-content">
+                        <span class="font-medium text-gray-800 mr-4">${formType} ACTION TABLE</span>
+                        <a href="/forms/${filename}" target="_blank" class="w-24 flex-shrink-0 flex justify-center items-center px-3 py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 transition duration-150 space-x-1">
+                            <span class="material-icons text-base">launch</span>
+                            <span>Open Form</span>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        mainContent.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <p class="text-gray-600 mb-6">Click 'Open Form' to fill out the respective action table. After filling and submitting the form, it will appear in the Activity section.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    ${formListHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    /** Renders the Settings section with user details and settings placeholders. */
+    function renderSettingsSection(mainContent) {
+        mainContent.innerHTML = `
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="border-b pb-4 mb-6">
+                    <h4 class="text-xl font-semibold text-gray-800 mb-2">User Account Details</h4>
+                    <div class="flex items-center space-x-3">
+                        <span class="material-icons text-4xl text-indigo-600">account_circle</span>
+                        <p class="text-lg font-medium text-gray-700">${USER_EMAIL}</p>
+                    </div>
+                    <p class="text-sm text-gray-500 mt-1">This is your logged-in HOI administrative account.</p>
+                </div>
+                
+                <h4 class="text-xl font-semibold text-gray-800 mb-4">Dashboard Preferences</h4>
+                
+                <div class="space-y-6">
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h5 class="text-lg font-medium text-gray-700 flex items-center">
+                                <span class="material-icons mr-2 text-xl">person</span>Profile Settings
+                            </h5>
+                            <button class="text-sm font-semibold text-blue-600 hover:text-blue-800">Edit</button>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Manage display name, password, and security questions.</p>
+                    </div>
+                    
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h5 class="text-lg font-medium text-gray-700 flex items-center">
+                                <span class="material-icons mr-2 text-xl">notifications</span>Notification Settings
+                            </h5>
+                            <button class="text-sm font-semibold text-blue-600 hover:text-blue-800">Configure</button>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Set preferences for pending approval alerts and daily report summaries.</p>
+                    </div>
+
+                    <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <h5 class="text-lg font-medium text-gray-700 flex items-center">
+                            <span class="material-icons mr-2 text-xl">lock</span>Permission Level
+                        </h5>
+                        <p class="text-sm text-gray-500 mt-1 font-semibold text-green-700">HOI - Head of Institution (Full Administrative Access)</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+  /** Renders the Reports section with all time-based filtering options. */
+function renderReportsSection(mainContent) {
+    mainContent.innerHTML = `
+        <div id="reports" class="bg-white p-6 rounded-xl shadow-lg">
+            <h4 class="text-xl font-semibold text-gray-800 mb-4">Select Timeframe for Reports</h4>
+            <p class="text-gray-600 mb-6">View all submitted forms within a specific period.</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
+                
+                <button id="btn-daily" onclick="renderFilteredReports('daily')" class="p-4 bg-indigo-100 text-indigo-700 rounded-lg font-semibold hover:bg-indigo-200 transition duration-150 flex flex-col items-center">
+                    <span class="material-icons text-3xl">calendar_today</span>
+                    <span class="mt-1">Daily Reports</span>
+                </button>
+                
+                <button id="btn-weekly" onclick="renderFilteredReports('weekly')" class="p-4 bg-indigo-100 text-indigo-700 rounded-lg font-semibold hover:bg-indigo-200 transition duration-150 flex flex-col items-center">
+                    <span class="material-icons text-3xl">view_week</span>
+                    <span class="mt-1">Weekly Reports</span>
+                </button>
+                
+                 <button id="btn-bi-monthly" onclick="renderFilteredReports('bi_monthly')" class="p-4 bg-indigo-100 text-indigo-700 rounded-lg font-semibold hover:bg-indigo-200 transition duration-150 flex flex-col items-center">
+                    <span class="material-icons text-3xl">date_range</span>
+                    <span class="mt-1">Bi-Monthly</span>
+                </button>
+
+                <button id="btn-monthly" onclick="renderFilteredReports('monthly')" class="p-4 bg-indigo-100 text-indigo-700 rounded-lg font-semibold hover:bg-indigo-200 transition duration-150 flex flex-col items-center">
+                    <span class="material-icons text-3xl">calendar_view_month</span>
+                    <span class="mt-1">Monthly Reports</span>
+                </button>
+                
+
+                <button id="btn-semester" onclick="renderFilteredReports('semester')" class="p-4 bg-indigo-100 text-indigo-700 rounded-lg font-semibold hover:bg-indigo-200 transition duration-150 flex flex-col items-center">
+                    <span class="material-icons text-3xl">school</span>
+                    <span class="mt-1">Semester</span>
+                </button>
+
+                <button id="btn-yearly" onclick="renderFilteredReports('yearly')" class="p-4 bg-indigo-100 text-indigo-700 rounded-lg font-semibold hover:bg-indigo-200 transition duration-150 flex flex-col items-center">
+                    <span class="material-icons text-3xl">event</span>
+                    <span class="mt-1">Yearly Reports</span>
+                </button>
+            </div>
+
+            <div id="filteredReportList" class="border-t pt-4">
+                <p class="text-center text-gray-500">Select a timeframe above to view the reports.</p>
+            </div>
+        </div>
+    `;
+}
+    
+/**
+ * Filters submissions based on timeframe and renders them as a report list.
+ * This function relies on the global 'submissions' array and time constants 
+ * (e.g., ONE_DAY_MS, ONE_WEEK_MS, ONE_MONTH_MS, BI_MONTHLY_MS, SEMESTER_MS, ONE_YEAR_MS).
+ */
+function renderFilteredReports(timeframe) {
+    const reportListDiv = document.getElementById('filteredReportList');
+    
+    // Safety check for data loading
+    if (!submissions || submissions.length === 0) {
+        reportListDiv.innerHTML = `<p class="text-center text-red-500 mt-4">Data not loaded. Please wait for initial sync.</p>`;
+        return;
+    }
+
+    // --- 1. Highlight the active button ---
+    
+    // Remove active state from all buttons
+    document.querySelectorAll('#reports button').forEach(btn => {
+        btn.classList.remove('bg-indigo-600', 'text-white');
+        btn.classList.add('bg-indigo-100', 'text-indigo-700');
+    });
+
+    // Add active state to the clicked button
+    const buttonId = `btn-${timeframe.replace('_', '-')}`;
+    const clickedButton = document.getElementById(buttonId);
+    if(clickedButton) {
+        clickedButton.classList.add('bg-indigo-600', 'text-white');
+        clickedButton.classList.remove('bg-indigo-100', 'text-indigo-700');
+    }
+
+    reportListDiv.innerHTML = '<p class="text-center text-blue-500 mt-4"><span class="loader"></span> Loading reports...</p>';
+
+
+    let filteredList;
+    let title;
+    const now = Date.now();
+    
+    // --- 2. Custom logic for filtering ---
+    
+    if (timeframe === 'daily') {
+        // Daily Report: MUST show forms that are currently in 'activity' status 
+        // AND submitted in the last 24 hours.
+        const cutoffTime = now - ONE_DAY_MS; // Last 24 hours
+
+        filteredList = submissions
+            .filter(s => {
+                // s.submittedAt is expected to be in milliseconds
+                return s.status === 'activity' && s.submittedAt >= cutoffTime;
+            })
+            .sort((a, b) => b.submittedAt - a.submittedAt);
+            
+        title = 'Daily Activity Report: Submissions in the Last 24 Hours (Status: ACTIVITY ONLY)';
+
+    } else {
+        // For Weekly, Monthly, Bi-Monthly, Semester, and Yearly: 
+        // Show ALL submissions (all statuses) submitted within the specific period.
+        
+        let periodMs;
+        let reportName;
+
+        if (timeframe === 'weekly') {
+            periodMs = ONE_WEEK_MS;
+            reportName = 'Last 7 Days (Weekly Report)';
+        } else if (timeframe === 'monthly') {
+            periodMs = ONE_MONTH_MS;
+            reportName = 'Last 30 Days (Monthly Report)';
+        } else if (timeframe === 'bi_monthly') { // NEW
+            periodMs = BI_MONTHLY_MS;
+            reportName = 'Last 60 Days (Bi-Monthly Report)';
+        } else if (timeframe === 'semester') { // NEW (Replaces 'bi_yearly')
+            periodMs = SEMESTER_MS;
+            reportName = 'Last 6 Months (Semester Report)';
+        } else if (timeframe === 'yearly') { // NEW
+            periodMs = ONE_YEAR_MS;
+            reportName = 'Last 365 Days (Yearly Report)';
+        } else {
+            // Fallback
+            reportListDiv.innerHTML = `<p class="text-center text-red-500 mt-4">Invalid timeframe selected.</p>`;
+            return;
+        }
+
+        const cutoffTime = now - periodMs;
+        title = `Submissions in the ${reportName} (All Statuses)`;
+
+        // Filter by submission time, ignoring current status
+        filteredList = submissions
+            .filter(s => s.submittedAt >= cutoffTime)
+            .sort((a, b) => b.submittedAt - a.submittedAt); 
+    }
+
+    // --- 3. Render the Results Table ---
+
+    const tableRows = filteredList.length > 0
+        ? filteredList.map(s => {
+            // Use your existing status color logic
+            const statusColor = s.status === 'approved' ? 'text-green-600' : 
+                                s.status === 'disapproved' || s.status === 'alert' ? 'text-red-600' : 
+                                'text-yellow-600'; 
+            
+            // NOTE: I'm replacing the hardcoded s.id, s.subject etc. in the openModal call with the necessary variables.
+            // Ensure your openModal function accepts these arguments correctly.
+            // If openModal expects ID only, simplify the onclick attribute.
+            return `
+            <tr onclick="openModal('${s.id}')" class="border-b hover:bg-gray-50 cursor-pointer">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${s.form}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 truncate">${s.subject}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.user}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm ${statusColor} font-semibold">
+                    ${s.status.toUpperCase()}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(s.submittedAt).toLocaleString()}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <span class="text-blue-600 hover:text-blue-900">VIEW</span>
+                </td>
+            </tr>
+            `;
+        }).join('')
+        : `<tr><td colspan="6" class="px-6 py-10 text-center text-gray-500 text-base">No submissions found in the selected timeframe.</td></tr>`;
+
+    const reportContent = document.getElementById('filteredReportList');
+    reportContent.innerHTML = `
+        <h5 class="text-lg font-semibold text-gray-800 mb-3">${title} (${filteredList.length} Forms)</h5>
+        <div class="overflow-x-auto border rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject/Title</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted By</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted Date</th>
+                        <th scope="col" class="relative px-6 py-3"><span class="sr-only">Action</span></th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+    
+    // --- MODAL AND ACTION FUNCTIONS (Unchanged) ---
+
+    /** Opens the approval modal with submission details, fetching full raw data from server. */
+    async function openModal(formTitle, user, submissionId, subject) {
+        const submission = submissions.find(s => s.id === submissionId);
+        
+        if (!submission) {
+            alert(`Error: Submission ID ${submissionId} not found in current data state.`);
+            return;
+        }
+
+        document.getElementById('modalTitle').textContent = `Review: ${formTitle}`;
+        document.getElementById('modalUser').textContent = `Submitted by: ${user}`;
+        document.getElementById('remarksBox').value = submission.remarks || ''; 
+        currentSubmissionId = submissionId;
+
+        const isActionable = submission.status === 'activity' || submission.status === 'pending' || submission.status === 'alert';
+        document.getElementById('approveBtn').style.display = isActionable ? 'flex' : 'none';
+        document.getElementById('rejectBtn').style.display = isActionable ? 'flex' : 'none';
+        document.getElementById('alertBtn').style.display = isActionable ? 'flex' : 'none';
+
+        const loadingHtml = `
+            <p class="text-sm"><strong>ID:</strong> ${submissionId}</p>
+            <p class="text-sm"><strong>Subject:</strong> ${subject}</p>
+            <p class="text-sm"><strong>Status:</strong> <span class="${submission.status === 'approved' ? 'text-green-600' : submission.status === 'disapproved' || submission.status === 'alert' ? 'text-red-600' : 'text-yellow-600'}">${submission.status.toUpperCase()}</span></p>
+            <p class="mt-2 text-blue-600"><strong>Data Preview:</strong> <pre class="whitespace-pre-wrap text-xs bg-white p-2 border rounded">Fetching full form data...</pre></p>
+        `;
+        document.getElementById('submissionDetails').innerHTML = loadingHtml;
+
+        document.getElementById('approvalModalOverlay').classList.remove('hidden');
+
+        try {
+            const response = await fetch(`/api/submission/${submissionId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                const fullSubmission = data.submission;
+                let dataContentHtml = '';
+
+                if (fullSubmission.data) {
+                    try {
+                        const parsedData = JSON.parse(fullSubmission.data);
+                        
+                        dataContentHtml += '<div class="bg-gray-100 p-3 rounded max-h-60 overflow-y-auto border border-gray-300 space-y-1">';
+                        
+                        Object.entries(parsedData).forEach(([key, value]) => {
+                            if (value === null || value === undefined || value === "") return; 
+
+                            const isCritical = key.includes('Reason') || key.includes('Impact') || key.includes('Risk') || key.includes('Intervention') || key.includes('Action');
+                            const keyDisplay = key.toUpperCase().replace(/_/g, ' '); 
+                            
+                            const valueDisplay = typeof value === 'object' && value !== null
+                                ? JSON.stringify(value)
+                                : value;
+
+                            dataContentHtml += `
+                                <p class="text-xs leading-tight">
+                                    <strong class="text-gray-700">${keyDisplay}:</strong> 
+                                    <span class="${isCritical ? 'text-red-700 font-bold' : 'text-blue-700 font-semibold'}">${valueDisplay}</span>
+                                </p>
+                            `;
+                        });
+                        
+                        dataContentHtml += '</div>';
+
+                    } catch (e) {
+                        console.error("Error parsing submission data for display:", e);
+                        dataContentHtml = `<p class="text-red-500 text-xs mt-2">Error parsing JSON data. Raw content:</p><pre class="whitespace-pre-wrap text-xs bg-white p-2 border rounded">${fullSubmission.data}</pre>`;
+                    }
+                } else {
+                    dataContentHtml = '<p class="text-gray-500">No form data found in the submission.</p>';
+                }
+
+                const detailsHtml = `
+                    <p class="text-sm"><strong>ID:</strong> ${fullSubmission.id}</p>
+                    <p class="text-sm"><strong>Subject:</strong> ${fullSubmission.subject}</p>
+                    <p class="text-sm"><strong>Status:</strong> <span class="${fullSubmission.status === 'approved' ? 'text-green-600' : fullSubmission.status === 'disapproved' || fullSubmission.status === 'alert' ? 'text-red-600' : 'text-yellow-600'} font-semibold">${submission.status.toUpperCase()}</span></p>
+                    <p class="text-sm"><strong>Submitted At:</strong> ${new Date(fullSubmission.submittedAt * 1000).toLocaleString()}</p>
+                    ${fullSubmission.approvedAt ? `<p class="text-sm"><strong>Processed At:</strong> ${new Date(fullSubmission.approvedAt * 1000).toLocaleString()}</p>` : ''}
+                    ${fullSubmission.reviewedBy ? `<p class="text-sm"><strong>Reviewed By:</strong> ${fullSubmission.reviewedBy}</p>` : ''}
+                    ${fullSubmission.remarks ? `<p class="text-sm mt-2"><strong>Last Remarks:</strong> <span class="text-red-500">${fullSubmission.remarks}</span></p>` : ''}
+                    <div class="mt-4"><strong>Form Details:</strong> ${dataContentHtml}</div>
+                `;
+                document.getElementById('submissionDetails').innerHTML = detailsHtml;
+
+            } else {
+                document.getElementById('submissionDetails').innerHTML += `<p class="text-red-500 mt-2">Error loading full details: ${data.message}</p>`;
+            }
+        } catch (e) {
+            console.error("Fetch Details Error:", e);
+            document.getElementById('submissionDetails').innerHTML += `<p class="text-red-500 mt-2">Network error while fetching details. Check your Flask server.</p>`;
+        }
+    }
+
+    /** Closes the approval modal. */
+    function closeModal() {
+        document.getElementById('approvalModalOverlay').classList.add('hidden');
+        currentSubmissionId = null;
+    }
+
+    /** Processes the submission action. */
+    async function processSubmission(action) {
+        const remarks = document.getElementById('remarksBox').value.trim();
+        
+        if ((action === 'disapproved' || action === 'alert') && remarks === '') {
+            alert(`${action.toUpperCase()}-Compulsory fill it remarks.`);
+            return;
+        }
+
+        const actionVerb = action === 'approved' ? 'Approve' : action === 'disapproved' ? 'Disapprove' : 'Flag as ALERT';
+        if (!confirm(`Are you sure you want to ${actionVerb} this submission (ID: ${currentSubmissionId})?`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/process_approval', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    submission_id: currentSubmissionId,
+                    action: action,
+                    remarks: remarks
+                })
+            });
+            
+            const data = await response.json();
+
+            if (data.success) {
+                alert(`${action.toUpperCase()} sucessfully verified!`);
+                closeModal();
+                await fetchSubmissions(); 
+                switchSection(activeSection); 
+            } else {
+                alert(`Error: ${data.message}`);
+            }
+
+        } catch (error) {
+            console.error('Error processing submission:', error);
+            alert('An error occurred while processing the submission (Check server console).');
+        }
+    }
+    
+    // --- CHATBOT FUNCTIONS (Unchanged) ---
+
+    function toggleChatbot() {
+        const chatbotWindow = document.getElementById('chatbotWindow');
+        chatbotWindow.classList.toggle('hidden');
+        if (!chatbotWindow.classList.contains('hidden')) {
+            document.getElementById('chatbotInput').focus();
+        }
+    }
+
+    /** Sends the message to the Flask API and handles the response. */
+    async function sendMessage() {
+        const input = document.getElementById('chatbotInput');
+        const messageText = input.value.trim();
+        if (messageText === '') return;
+
+        appendMessage(messageText, 'user');
+        input.value = '';
+        
+        const typingIndicator = appendMessage(null, 'assistant-typing');
+        
+        try {
+            const response = await fetch('/api/chatbot_reply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: messageText })
+            });
+            
+            const data = await response.json();
+            
+            typingIndicator.remove(); 
+            
+            if (data.status === 'ok') {
+                appendMessage(data.reply, 'assistant');
+            } else {
+                appendMessage(`Error: ${data.reply}`, 'assistant');
+            }
+
+        } catch (error) {
+            typingIndicator.remove(); 
+            console.error('Chatbot API Error:', error);
+            appendMessage('Network or server error occurred while contacting the assistant.', 'assistant');
+        }
+    }
+
+    /** Utility function to append messages to the chat window. */
+    function appendMessage(text, type) {
+        const messagesDiv = document.getElementById('chatbotMessages');
+        const messageContainer = document.createElement('div');
+        
+        if (type === 'user') {
+            messageContainer.className = 'flex justify-end';
+            messageContainer.innerHTML = `<div class="bg-blue-600 text-white p-2 rounded-lg max-w-xs shadow">${text}</div>`;
+        } else if (type === 'assistant') {
+            messageContainer.className = 'flex justify-start';
+            messageContainer.innerHTML = `<div class="bg-gray-200 p-2 rounded-lg max-w-xs shadow whitespace-pre-wrap">${text}</div>`;
+        } else if (type === 'assistant-typing') {
+            messageContainer.id = 'typingIndicator'; 
+            messageContainer.className = 'flex justify-start';
+            messageContainer.innerHTML = `<div class="bg-gray-200 p-2 rounded-lg max-w-xs"><div class="dot-flashing"></div></div>`;
+        }
+
+        messagesDiv.appendChild(messageContainer);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        
+        return messageContainer;
+    }
+
+</script>
+
+</body>
+</html>

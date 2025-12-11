@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SAFETY REPORT</title>
+
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    :root{
+      --header-bg:#ffffff;
+      --page-teal:#006d77;
+      --card-bg:#ffffff;
+      --tab-bg:#e5edf0;
+      --tab-active:#006d77;
+      --tab-text:#475569;
+      --muted:#6b7280;
+      --danger:#d32f2f;
+      --teal-dark:#005b63;
+      --shadow-card:0 18px 45px rgba(0,0,0,0.18);
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{
+      height:100%;
+      font-family:"Segoe UI",system-ui,-apple-system,BlinkMacSystemFont,"Roboto","Helvetica Neue",Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+    body{
+      background:var(--page-teal);
+      color:#111827;
+    }
+
+    /* TOP HEADER */
+    .app-header{
+      background:var(--header-bg);
+      padding:10px 32px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      box-shadow:0 2px 8px rgba(0,0,0,0.15);
+      position:relative;
+      z-index:5;
+    }
+    .header-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .header-left img{
+      height:56px;
+      max-width:260px;
+      object-fit:contain;
+    }
+    .header-right{
+      display:flex;
+      align-items:center;
+      gap:14px;
+    }
+    .hoi-pill{
+      padding:8px 16px;
+      border-radius:999px;
+      background:linear-gradient(180deg,#ffd54f,#ffb300);
+      border:1px solid #ff9800;
+      font-size:13px;
+      font-weight:800;
+      color:#5d3a00;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .back-btn{
+      padding:8px 14px;
+      border-radius:999px;
+      border:1px solid #d6e1e5;
+      background:#fff;
+      font-size:13px;
+      font-weight:600;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .header-right-text{
+      display:flex;
+      flex-direction:column;
+      text-align:right;
+      line-height:1.1;
+    }
+    .header-right-text span:first-child{
+      font-weight:800;
+      font-size:16px;
+    }
+    .header-right-text span:last-child{
+      font-size:11px;
+      color:#9ca3af;
+    }
+    .header-right img.logo-right{
+      height:44px;
+      max-width:170px;
+      object-fit:contain;
+    }
+
+    /* PAGE + CARD */
+    .page{
+      padding:34px 16px 50px;
+    }
+    .card-wrap{
+      max-width:1120px;
+      margin:0 auto;
+      background:var(--card-bg);
+      border-radius:18px;
+      box-shadow:var(--shadow-card);
+      padding:26px 30px 28px;
+    }
+
+    .report-title{
+      text-align:center;
+      margin-bottom:6px;
+      font-size:24px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      color:#ffffff;
+      font-weight:900;
+    }
+    .report-subtitle{
+      text-align:center;
+      color:#d1fae5;
+      font-size:12px;
+      margin-bottom:10px;
+    }
+
+    .inner-title{
+      text-align:center;
+      margin-bottom:12px;
+    }
+    .inner-title h2{
+      margin:0;
+      font-size:22px;
+      color:var(--teal-dark);
+      letter-spacing:.14em;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    /* FREQUENCY TABS */
+    .freq-tabs-wrap{
+      display:flex;
+      justify-content:center;
+      margin:18px 0 16px;
+    }
+    .freq-tabs{
+      display:flex;
+      background:var(--tab-bg);
+      border-radius:999px;
+      padding:4px;
+      gap:4px;
+    }
+    .freq-tab{
+      min-width:110px;
+      padding:8px 22px;
+      border-radius:999px;
+      border:0;
+      background:transparent;
+      color:var(--tab-text);
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:background .15s,color .15s,box-shadow .15s;
+    }
+    .freq-tab.active{
+      background:var(--tab-active);
+      color:#fff;
+      box-shadow:0 4px 10px rgba(0,0,0,0.25);
+    }
+
+    .divider{
+      border-top:1px solid #e5edf0;
+      margin-bottom:18px;
+    }
+
+    /* FORM SECTIONS */
+    .section{
+      background:#fbfeff;
+      border-radius:12px;
+      padding:16px 16px 14px;
+      border:1px solid #e3edf0;
+      margin-bottom:14px;
+    }
+    .section-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .section-head i{
+      width:28px;
+      height:28px;
+      border-radius:8px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:#e0f2f2;
+      color:var(--teal-dark);
+      font-size:14px;
+    }
+    .section-head span{
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--teal-dark);
+    }
+
+    .grid{display:grid;gap:14px 18px}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+    @media(max-width:980px){
+      .grid-4,.grid-3,.grid-2{grid-template-columns:1fr}
+      .card-wrap{padding:22px 18px}
+      .app-header{padding:10px 16px}
+    }
+
+    label{
+      display:block;
+      font-weight:700;
+      font-size:14px;
+      margin-bottom:5px;
+      color:#111827;
+    }
+    .req{color:var(--danger);margin-left:4px}
+    input[type="text"],
+    textarea,
+    select{
+      width:100%;
+      padding:8px 10px;
+      border-radius:8px;
+      border:1px solid #d6e1e5;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+      transition:border-color .15s,box-shadow .15s;
+    }
+    input:focus,textarea:focus,select:focus{
+      border-color:var(--teal-dark);
+      box-shadow:0 0 0 2px rgba(0,109,119,0.18);
+    }
+    textarea{min-height:70px;resize:vertical}
+    .hint{font-size:11px;color:var(--muted);margin-top:3px}
+
+    .checkbox-group{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:13px;
+    }
+    .checkbox-row{
+      display:flex;
+      align-items:flex-start;
+      gap:7px;
+    }
+    .checkbox-row input{margin-top:2px}
+
+    .inline-options{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px 16px;
+      font-size:13px;
+    }
+    .inline-options label{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .submit-area{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:16px;
+      border-top:1px dashed #e4eef1;
+      padding-top:12px;
+    }
+    .btn{
+      padding:9px 18px;
+      border-radius:10px;
+      border:0;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn.primary{background:var(--teal-dark);color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #d6e1e5;color:#111827}
+
+    .msg{font-size:12px;margin-top:6px}
+    .msg-ok{color:#15803d}
+    .msg-err{color:#d32f2f}
+
+    .hidden{display:none!important;}
+
+    /* HOI OVERLAY */
+    .overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+    }
+    .overlay-inner{
+      background:#fff;
+      border-radius:14px;
+      padding:20px 22px;
+      width:520px;
+      max-width:94%;
+      box-shadow:0 26px 80px rgba(0,0,0,0.45);
+    }
+    .overlay-inner h3{
+      margin:0 0 6px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      color:var(--danger);
+      font-size:18px;
+    }
+    .overlay-inner p{
+      margin:0 0 10px;
+      font-size:13px;
+      color:#4b5563;
+    }
+  </style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-left">
+    <!-- College logo -->
+    <img src="/public/clg-logo.png" alt="Sri Shanmugha Educational Institutions"
+         onerror="this.style.display='none'">
+  </div>
+
+  <div class="header-right">
+    <button type="button" class="hoi-pill" id="hoiPill">
+      <i class="fas fa-exclamation-circle"></i>
+      HOI Intervention Needed
+    </button>
+
+    <button type="button" class="back-btn" onclick="history.back()">
+      ← Back
+    </button>
+
+    <div class="header-right-text">
+      <!-- optional text -->
+    </div>
+    <!-- aakam logo right corner -->
+    <img src="/public/aakam-logo.png" alt="aakam 360" class="logo-right"
+         onerror="this.style.display='none'">
+  </div>
+</header>
+
+<div class="page">
+  <div class="report-title">SAFETY REPORT</div>
+  <div class="report-subtitle">
+    <!-- optional subtitle -->
+  </div>
+
+  <div class="card-wrap">
+    <div class="inner-title">
+      <h2>SELECT FREQUENCY</h2>
+    </div>
+
+    <div class="freq-tabs-wrap">
+      <div class="freq-tabs">
+        <button type="button" class="freq-tab active" data-panel="daily">Daily</button>
+        <button type="button" class="freq-tab" data-panel="weekly">Weekly</button>
+        <button type="button" class="freq-tab" data-panel="monthly">Monthly</button>
+        <button type="button" class="freq-tab" data-panel="yearly">Yearly</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- DAILY PANEL -->
+    <div id="panel-daily" class="freq-panel">
+      <form id="dailyForm" onsubmit="event.preventDefault(); submitSafety('Daily');">
+
+        <!-- ORIGINAL DAILY (Q2–Q27) -->
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-video"></i>
+            <span>CCTV & SECURITY </span>
+          </div>
+          <div class="grid grid-3">
+            <div>
+              <label>CCTV working? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>CCTV – Common Area OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>CCTV – A Block OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>CCTV – B Block OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>CCTV – Boys Hostel OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>CCTV – Girls Hostel OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>CCTV – E Block OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>CCTV monitoring done? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Security gate active? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-user-md"></i>
+            <span>HEALTH, RESPONSE & LIFT </span>
+          </div>
+          <div class="grid grid-3">
+            <div>
+              <label>Mental health nurse available? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Doctor available? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Pharmacy available? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Ambulance available? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Lift working? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-plug"></i>
+            <span>SHUTDOWN & SAFETY </span>
+          </div>
+          <div class="grid grid-3">
+            <div>
+              <label>Electricity switched off? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Gas switched off? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Water gate valve off? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Electricity safety OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Fire safety OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-flask"></i>
+            <span>LABS, MESS & FLOOR </span>
+          </div>
+          <div class="grid grid-3">
+            <div>
+              <label>Pharmacy lab safety <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Nursing lab safety <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Mess cylinder checked? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>External canteen cylinder checked? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Food hygiene OK? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Floor duty completed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Gym/Ground maintained? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW DAILY CHECKLIST – LAB / GENERAL / STUDENT / TRANSPORT / HOSTEL / MESS -->
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-vials"></i>
+            <span>LAB SAFETY</span>
+          </div>
+          <div class="checkbox-group">
+            <label class="checkbox-row">
+              <input type="checkbox" name="lab_safety[]" value="Safety instructions displayed clearly">
+              <span>Safety instructions displayed clearly</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="lab_safety[]" value="Chemical storage labeled and secured">
+              <span>Chemical storage labeled and secured</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="lab_safety[]" value="PPE (gloves, goggles) available">
+              <span>Personal Protective Equipment (gloves, goggles) available</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="lab_safety[]" value="Gas pipelines checked">
+              <span>Gas pipelines check</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="lab_safety[]" value="First aid box available and updated">
+              <span>First aid box</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-building"></i>
+            <span>GENERAL SAFETY</span>
+          </div>
+          <div class="checkbox-group">
+            <label class="checkbox-row">
+              <input type="checkbox" name="general_safety[]" value="CCTV functioning and recording">
+              <span>CCTV cameras functioning and recording properly – Daily check</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="general_safety[]" value="Electrical wiring insulated; no loose connections">
+              <span>Electrical wiring properly insulated and no loose connections</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="general_safety[]" value="Fire extinguishers available and within validity">
+              <span>Fire extinguishers – availability and validity date</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="general_safety[]" value="All block terraces locked">
+              <span>All blocks – Terrace locked</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="general_safety[]" value="First aid kit available and valid">
+              <span>First Aid kit – availability and validity</span>
+            </label>
+
+            <div style="margin-top:8px;font-weight:700;">Workshop</div>
+            <label class="checkbox-row">
+              <input type="checkbox" name="workshop[]" value="Safety Kit available">
+              <span>Safety Kit</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="workshop[]" value="Fire safety equipment available">
+              <span>Fire safety equipment</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="workshop[]" value="Electrical safety while using tools followed">
+              <span>Electrical Safety while using tools</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="workshop[]" value="PPE kit used properly">
+              <span>PPE Kit</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-venus-mars"></i>
+            <span>STUDENTS & WOMEN SAFETY</span>
+          </div>
+          <div class="checkbox-group">
+            <label class="checkbox-row">
+              <input type="checkbox" name="student_women[]" value="Security patrolling during night and morning">
+              <span>Security patrolling during night and morning</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="student_women[]" value="All systems and equipment switched off in evening">
+              <span>All systems and equipment are switched off every evening</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="student_women[]" value="Gas lines switched off in labs">
+              <span>All Gaslines are switched off – check in Labs</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="student_women[]" value="Anti-ragging committee active">
+              <span>Anti-ragging committee</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="student_women[]" value="Helpline numbers displayed">
+              <span>Helpline numbers displayed</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="student_women[]" value="Internal complaints committee displayed">
+              <span>Internal complaints committee established and displayed</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-bus"></i>
+            <span>TRANSPORT SAFETY</span>
+          </div>
+          <div class="checkbox-group">
+            <label class="checkbox-row">
+              <input type="checkbox" name="transport[]" value="Drivers fitness and medical check done">
+              <span>Driver’s fitness and medical check-up (Eye, Ear)</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="transport[]" value="Vehicle driving and speed monitored">
+              <span>Vehicle driving and speed check</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="transport[]" value="First aid and fire extinguisher in all buses">
+              <span>First Aid and Fire extinguisher in all buses</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="transport[]" value="CCTV, GPS, voice recording checked for all vehicles">
+              <span>CCTV (road facing & inside view), GPS and voice recording check in all buses, cars and ambulances</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="transport[]" value="Driver license and vehicle fitness valid">
+              <span>Driver’s license and vehicle fitness check</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="transport[]" value="Parking area safe and organized">
+              <span>Parking area safety</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-bed"></i>
+            <span>HOSTEL SAFETY</span>
+          </div>
+          <div class="checkbox-group">
+            <label class="checkbox-row">
+              <input type="checkbox" name="hostel[]" value="Pending student complaints addressed">
+              <span>Student long-pending complaints are addressed</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="hostel[]" value="No partiality in handling students">
+              <span>Ensuring no partiality in handling the students (Warden vs Students)</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="hostel[]" value="Security personnel attendance in hostels">
+              <span>Security personnel mandatory in the hostels – attendance check</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="hostel[]" value="Balcony and staircase grills fitted">
+              <span>Balcony grills and staircase grills are fitted</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="hostel[]" value="Fire and first aid box on all floors">
+              <span>Fire and first aid box in all the floors</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="hostel[]" value="Contact numbers displayed (warden, chief warden, police)">
+              <span>Warden, chief warden, police station contact displayed</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="hostel[]" value="Outsider entry/exit validated">
+              <span>Outsiders – all entry and exit validated</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-utensils"></i>
+            <span>MESS SAFETY & HYGIENE</span>
+          </div>
+          <div class="checkbox-group">
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Gas cylinders leakage and lid checked">
+              <span>Gas cylinders – leakage check and open/close lid check</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Grocery validity and quality checked">
+              <span>Store – all groceries validity date and quality checked</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Fridge and freezer working; storage proper">
+              <span>Fridge and freezer checked and storage ensured</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Waste disposed every day">
+              <span>Waste disposed every day</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Hygiene in kitchen, dining, store, veg cutting area">
+              <span>Hygiene check – kitchen, dining, store and veg cutting area</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Cooking water checked and noted daily">
+              <span>Cooking water checked every day and note maintained</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Kitchen staff wear safety kit">
+              <span>Staff wear safety kit during cooking in kitchen</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="All workers follow safety and hygiene (gloves, headcap, uniform)">
+              <span>All workers follow safety & hygiene (gloves, headcap, uniform)</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="All vessels properly closed after use">
+              <span>Ensuring all vessels are properly closed after cooking and dining</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="No expired/colour/open type materials used">
+              <span>No expired, colour or open-type materials are used for cooking</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Procurements only from govt-approved vendors">
+              <span>Ensure all procurements are from Govt registered & approved vendors (no local purchases)</span>
+            </label>
+            <label class="checkbox-row">
+              <input type="checkbox" name="mess[]" value="Fresh vegetables received; not stored >3 days">
+              <span>All vegetables checked – fresh, received on alternate days; not stored for more than 3 days</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="dailySubmitMsg" class="msg"></div>
+        <!-- daily submit button removed -->
+      </form>
+    </div>
+
+    <!-- WEEKLY PANEL -->
+    <div id="panel-weekly" class="freq-panel hidden">
+      <form id="weeklyForm" onsubmit="event.preventDefault(); submitSafety('Weekly');">
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-calendar-week"></i>
+            <span>WEEKLY ACTIVITIES </span>
+          </div>
+          <div class="grid grid-2">
+            <div>
+              <label>Food vendor complaints checked? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Food committee meeting/report done? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Floor duty chart validated? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Genset ready? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>CCTV blind spots checked? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="weeklySubmitMsg" class="msg"></div>
+        <!-- weekly submit button removed -->
+      </form>
+    </div>
+
+    <!-- MONTHLY PANEL -->
+    <div id="panel-monthly" class="freq-panel hidden">
+      <form id="monthlyForm" onsubmit="event.preventDefault(); submitSafety('Monthly');">
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-calendar-alt"></i>
+            <span>MONTHLY COMPLIANCE & DISCIPLINE </span>
+          </div>
+          <div class="grid grid-3">
+            <div>
+              <label>POSH report submitted? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Anti-ragging session/report done? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>POSH session/report done? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Student discipline reviewed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Employee discipline reviewed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Girl-student enquiry completed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Female-employee enquiry completed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Boy-student enquiry completed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Male-employee enquiry completed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-wrench"></i>
+            <span>MONTHLY MAINTENANCE & RECORDS </span>
+          </div>
+          <div class="grid grid-4">
+            <div>
+              <label>Health & safety records updated? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Fire extinguisher refill done? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>First-aid box updated? (1) <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>First-aid box updated? (2) <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Genset serviced? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>UPS serviced? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+            <div>
+              <label>Earth check completed? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option><option>Yes</option><option>No</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div id="monthlySubmitMsg" class="msg"></div>
+        <!-- monthly submit button removed -->
+      </form>
+    </div>
+
+    <!-- YEARLY PANEL -->
+    <div id="panel-yearly" class="freq-panel hidden">
+      <form id="yearlyForm" onsubmit="event.preventDefault(); submitSafety('Yearly');">
+        <div class="section">
+          <div class="section-head">
+            <i class="fas fa-calendar-check"></i>
+            <span>YEARLY ACTIVITY (Q49)</span>
+          </div>
+          <div class="grid grid-2">
+            <div>
+              <label>Ragging consent forms collected? <span class="req">*</span></label>
+              <select required>
+                <option value="">Select</option>
+                <option>Yes</option>
+                <option>No</option>
+                <option>In Progress</option>
+              </select>
+            </div>
+            <div>
+              <label>Yearly Compliance Notes</label>
+              <textarea placeholder="Record status of annual audits or compliances."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div id="yearlySubmitMsg" class="msg"></div>
+        <!-- yearly submit button removed -->
+      </form>
+    </div>
+
+    <!-- FINAL COMPLETION, ISSUES, WASTE, KPI, RISK, SUPPORT (Q50–Q57) -->
+    <div class="divider" style="margin-top:22px;"></div>
+
+    <div class="section">
+      <div class="section-head">
+        <i class="fas fa-clipboard-check"></i>
+        <span>COMPLETION STATUS </span>
+      </div>
+      <div class="grid grid-2">
+        <div>
+          <label>Status of Activity <span class="req">*</span></label>
+          <select id="activityStatus" onchange="toggleReasonField(this.value)" required>
+            <option value="">Select</option>
+            <option value="Completed">Completed</option>
+            <option value="Partially Completed">Partially Completed</option>
+            <option value="Not Completed">Not Completed</option>
+          </select>
+        </div>
+        <div id="reason-group" class="hidden">
+          <label>If partially/not completed, specify reason <span class="req">*</span></label>
+          <textarea id="reasonText" placeholder="Mention key reasons."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>LEAN ISSUES & WASTE </span>
+      </div>
+      <div class="grid grid-2">
+        <div>
+          <label>Issues Faced <span class="req">*</span></label>
+          <div class="checkbox-group" id="issuesGroup">
+            <label class="checkbox-row"><input type="checkbox" value="Equipment not working"> <span>Equipment not working</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="CCTV downtime"> <span>CCTV downtime</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Delay in vendor response"> <span>Delay in vendor response</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Cylinder/Gas issues"> <span>Cylinder/Gas issues</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Documentation pending"> <span>Documentation pending</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Staff shortage"> <span>Staff shortage</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Safety compliance issue"> <span>Safety compliance issue</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="No issues"> <span>No issues</span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <i class="fas fa-chart-line"></i>
+        <span>KPI, RISK & SUPPORT</span>
+      </div>
+      <div class="grid grid-3">
+        <div>
+          <label>KPI Status</label>
+          <div class="checkbox-group" id="kpiGroup">
+            <label class="checkbox-row"><input type="checkbox" value="Safety Standards Achieved"> <span>Safety Standards Achieved</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Safe Operation Maintained"> <span>Safe Operation Maintained</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Compliance Met"> <span>Compliance Met</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Partially Met"> <span>Partially Met</span></label>
+            <label class="checkbox-row"><input type="checkbox" value="Not Met"> <span>Not Met</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div id="finalSubmitMsg" class="msg"></div>
+      <div class="submit-area">
+        <button type="button" class="btn secondary"
+                onclick="resetFinalSection();">
+          <i class="fas fa-rotate"></i> Clear Final Section
+        </button>
+        <button type="button" class="btn primary"
+                onclick="submitFinalStatus();">
+          <i class="fas fa-paper-plane"></i> Submit Overall Status
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- HOI OVERLAY -->
+<div id="hoiOverlay" class="overlay">
+  <div class="overlay-inner">
+    <h3><i class="fas fa-triangle-exclamation"></i> HOI IMMEDIATE INTERVENTION</h3>
+    <p>Use this space to summarise high-risk issues or support requests for the HOI.</p>
+
+    <div style="margin-top:6px;">
+      <label>Topic</label>
+      <input id="hoiTopic" type="text" placeholder="Eg. Major fire risk / CCTV failure / Gas safety">
+    </div>
+    <div style="margin-top:10px;">
+      <label>Immediate Action Required</label>
+      <textarea id="hoiDetails" rows="4"
+                placeholder="Clearly describe the situation and exact intervention needed."></textarea>
+    </div>
+
+    <div class="submit-area" style="margin-top:12px;">
+      <button type="button" class="btn secondary" onclick="closeHoi();">Cancel</button>
+      <button type="button" class="btn primary" onclick="submitHoi();">
+        <i class="fas fa-paper-plane"></i> Save Note (Mock)
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // --- TAB SWITCHING ---
+  document.querySelectorAll('.freq-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.panel;
+      document.querySelectorAll('.freq-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.freq-panel').forEach(p => p.classList.add('hidden'));
+      document.getElementById('panel-' + target).classList.remove('hidden');
+    });
+  });
+
+  // --- HOI OVERLAY ---
+  document.getElementById('hoiPill').addEventListener('click', () => {
+    document.getElementById('hoiOverlay').style.display = 'flex';
+    document.getElementById('hoiTopic').focus();
+  });
+
+  function closeHoi(){
+    document.getElementById('hoiOverlay').style.display = 'none';
+    document.getElementById('hoiTopic').value = '';
+    document.getElementById('hoiDetails').value = '';
+  }
+
+  function submitHoi(){
+    const topic = document.getElementById('hoiTopic').value.trim();
+    const details = document.getElementById('hoiDetails').value.trim();
+    if(!topic || !details){
+      alert('Please fill Topic and Immediate Action.');
+      return;
+    }
+    const payload = {
+      topic,
+      details,
+      created_at:new Date().toISOString()
+    };
+    console.log('HOI Intervention (mock):', payload);
+    alert('✅ HOI note prepared (mock). See console for JSON.');
+    closeHoi();
+  }
+
+  // --- FINAL SECTION TOGGLES / SUBMISSION ---
+
+  function toggleReasonField(value){
+    const group = document.getElementById('reason-group');
+    const txt = document.getElementById('reasonText');
+    if(value === 'Partially Completed' || value === 'Not Completed'){
+      group.classList.remove('hidden');
+      txt.required = true;
+    }else{
+      group.classList.add('hidden');
+      txt.required = false;
+      txt.value = '';
+    }
+  }
+
+  function toggleSupportField(value){
+    const field = document.getElementById('supportField');
+    const txt = document.getElementById('supportText');
+    if(value === 'Yes'){
+      field.classList.remove('hidden');
+      txt.required = true;
+    }else{
+      field.classList.add('hidden');
+      txt.required = false;
+      txt.value = '';
+    }
+  }
+
+  function getCheckedTexts(containerId){
+    const box = document.getElementById(containerId);
+    return Array.from(box.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(el => el.value);
+  }
+
+  function resetFinalSection(){
+    document.getElementById('activityStatus').value = '';
+    toggleReasonField('');
+    document.querySelectorAll('#issuesGroup input[type="checkbox"],#wasteGroup input[type="checkbox"],#kpiGroup input[type="checkbox"]').forEach(c => c.checked = false);
+    document.getElementById('riskLevel').value = '';
+    document.querySelectorAll('input[name="supportReq"]').forEach(r => {
+      if(r.value === 'No') r.checked = true;
+      else r.checked = false;
+    });
+    toggleSupportField('No');
+    document.getElementById('finalSubmitMsg').textContent = '';
+    document.getElementById('finalSubmitMsg').className = 'msg';
+  }
+
+  function submitFinalStatus(){
+    const msg = document.getElementById('finalSubmitMsg');
+    msg.textContent = '';
+    msg.className = 'msg';
+
+    const status = document.getElementById('activityStatus').value;
+    const reason = document.getElementById('reasonText').value.trim();
+    const issues = getCheckedTexts('issuesGroup');
+    const waste = getCheckedTexts('wasteGroup');
+    const kpi = getCheckedTexts('kpiGroup');
+    const risk = document.getElementById('riskLevel').value;
+    const supportRadio = document.querySelector('input[name="supportReq"]:checked');
+    const supportReq = supportRadio ? supportRadio.value : '';
+    const supportText = document.getElementById('supportText').value.trim();
+
+    const errors = [];
+    if(!status) errors.push('Status of Activity is required.');
+    if((status === 'Partially Completed' || status === 'Not Completed') && !reason){
+      errors.push('Please specify reason for partial/not completed status.');
+    }
+    if(issues.length === 0) errors.push('Please select at least one Issue faced.');
+    if(waste.length === 0) errors.push('Please select at least one Waste observed.');
+    if(supportReq === 'Yes' && !supportText){
+      errors.push('Please mention the support needed.');
+    }
+
+    if(errors.length){
+      msg.textContent = errors.join(' ');
+      msg.classList.add('msg-err');
+      return;
+    }
+
+    const payload = {
+      submitted_at:new Date().toISOString(),
+      status_of_activity:status,
+      reason_for_incompletion:reason,
+      issues_faced:issues,
+      waste_observed:waste,
+      kpi_status:kpi,
+      risk_level:risk,
+      support_required:supportReq,
+      support_details:supportText
+    };
+
+    console.log('SAFETY Final Status (mock):', payload);
+    msg.textContent = '✅ Overall status recorded (mock). See console for JSON payload.';
+    msg.classList.add('msg-ok');
+
+    // auto-open HOI if high risk or support needed
+    if(risk === 'High' || supportReq === 'Yes'){
+      document.getElementById('hoiOverlay').style.display = 'flex';
+      document.getElementById('hoiTopic').focus();
+    }
+  }
+
+  // --- SIMPLE MOCK SUBMISSIONS FOR FREQUENCY FORMS ---
+  function submitSafety(freq){
+    const id = freq.toLowerCase() + 'SubmitMsg';
+    const msg = document.getElementById(id);
+    if(!msg) return;
+    msg.textContent = `✅ ${freq} Checks submitted (mock).`;
+    msg.className = 'msg msg-ok';
+    console.log(`SAFETY ${freq} checks form submitted (mock).`);
+  }
+
+  // default initial state
+  toggleReasonField('');
+  toggleSupportField('No');
+</script>
+
+</body>
+</html>

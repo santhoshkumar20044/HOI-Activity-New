@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Infra Report Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --primary-color: #006d77; /* Teal Blue */
+            --secondary-color: #eefcfd;
+            --text-dark: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --danger: #d32f2f; /* Red for HOI */
+            --warning-bg: #ffc107;
+            --grey-btn: #78909c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER STYLES --- */
+        .custom-header {
+            background-color: #ffffff;
+            border-bottom: 8px solid #005f63; 
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo-left-img { height: 55px; object-fit: contain; }
+        .logo-right-img { height: 45px; object-fit: contain; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* Yellow Badge (Clickable Trigger) */
+        .hoi-badge {
+            background-color: var(--warning-bg);
+            color: #212529;
+            font-weight: 700;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer; /* Clickable */
+            transition: transform 0.2s;
+        }
+        .hoi-badge:hover { transform: scale(1.05); }
+        .hoi-icon { color: #dc3545; font-size: 16px; }
+
+        /* Back Button */
+        .btn-back {
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            color: #333;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .btn-back:hover { background-color: #f8f9fa; border-color: #adb5bd; }
+
+        /* --- MAIN CONTAINER & CARD --- */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            padding: 30px 15px;
+        }
+
+        .card {
+            background: var(--white); 
+            width: 100%;
+            max-width: 1100px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* --- TITLE & TABS --- */
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 28px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;
+        }
+
+        .tabs-container {
+            display: flex; background: #f3f4f6; padding: 5px; border-radius: 8px; margin-bottom: 30px;
+            gap: 5px; justify-content: center; max-width: 400px; margin-left: auto; margin-right: auto;
+        }
+
+        .tab-btn {
+            flex: 1; padding: 12px 10px; border: none; background: transparent; cursor: pointer;
+            font-weight: 700; color: #6b7280; border-radius: 6px; transition: all 0.3s; font-size: 15px;
+        }
+        .tab-btn:hover { background: #e5e7eb; }
+        .tab-btn.active { background: var(--primary-color); color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .report-header h2 { 
+            margin: 0 0 25px 0; color: #1f2937; font-size: 22px; border-left: 5px solid var(--primary-color); padding-left: 15px;
+        }
+
+        /* --- FORM STYLES --- */
+        .section-box {
+            background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin-bottom: 20px;
+            transition: transform 0.2s ease-in-out;
+        }
+        .section-box:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        .section-header {
+            display: flex; align-items: center; gap: 10px; color: var(--primary-color); font-weight: bold; margin-bottom: 20px; font-size: 16px; text-transform: uppercase;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 109, 119, 0.1);
+        }
+
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #444; }
+        .checkbox-group input { width: 18px; height: 18px; margin-top: 0; flex-shrink: 0; cursor: pointer; }
+
+        .submit-container { text-align: right; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 14px 40px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
+
+        .hidden { display: none; }
+        .reason-input { margin-top: 10px; display: none; background-color: #fef2f2; border-color: #fecaca !important; color: #b91c1c; }
+
+        /* --- MODAL STYLES (For HOI Popup) --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); z-index: 1000;
+            display: none; justify-content: center; align-items: center;
+        }
+        
+        .modal-content {
+            background: white; padding: 40px; border-radius: 8px;
+            width: 90%; max-width: 800px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative; animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .hoi-title {
+            color: var(--danger); font-size: 24px; font-weight: 800; text-align: center; text-transform: uppercase;
+            margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+
+        .hoi-divider { height: 2px; background-color: var(--danger); margin: 20px 0; }
+
+        .hoi-warning { color: var(--danger); font-size: 15px; margin-bottom: 20px; font-weight: 500; }
+
+        .hoi-footer { display: flex; gap: 15px; margin-top: 30px; justify-content: space-between; flex-wrap: wrap; }
+
+        .btn-hoi-submit {
+            background-color: var(--danger); color: white; border: none; padding: 12px 24px; font-weight: bold; border-radius: 4px; cursor: pointer; flex: 1;
+        }
+        .btn-hoi-cancel {
+            background-color: var(--grey-btn); color: white; border: none; padding: 12px 24px; font-weight: bold; border-radius: 4px; cursor: pointer; flex: 1;
+        }
+        .btn-hoi-submit:hover { background-color: #b71c1c; }
+        .btn-hoi-cancel:hover { background-color: #546e7a; }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .custom-header, .header-actions { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
+            .header-actions { width: 100%; }
+            .hoi-badge, .btn-back { width: 100%; justify-content: center; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 20px; }
+            .hoi-footer { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="custom-header">
+        <img src="/clg-logo.png" alt="College Logo" class="logo-left-img">
+
+        <div class="header-actions">
+            <div class="hoi-badge" onclick="openHOIModal()">
+                <i class="fas fa-exclamation-triangle hoi-icon"></i> 
+                HOI Intervention Needed
+            </div>
+            <a href="#" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <img src="/aakam-logo.png" alt="Aakam Logo" class="logo-right-img">
+        </div>
+    </header>
+
+    <div id="hoiModal" class="modal-overlay">
+        <div class="modal-content">
+            
+            <h2 class="hoi-title">
+                🚨 HOI IMMEDIATE INTERVENTION REQUIRED
+            </h2>
+            
+            <div class="hoi-divider"></div>
+
+            <p class="hoi-warning">
+                Use this form only for purchase issues requiring <strong>immediate</strong> Head of Institution (HOI) action (e.g., emergency equipment replacement, critical supplier failure).
+            </p>
+
+            <form>
+                <div class="form-group">
+                    <label>Brief Topic/Subject:</label>
+                    <input type="text" placeholder="e.g., Urgent machine breakdown, Immediate fund approval needed" style="border-color: #ddd;">
+                </div>
+
+                <div class="form-group">
+                    <label>Immediate Action Required (Short Answer Field):</label>
+                    <textarea rows="4" placeholder="Clearly describe the emergency and the exact intervention needed from the HOI" style="border-color: #ddd;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Supporting Document (Optional):</label>
+                    <input type="file" style="border: 1px solid #ddd; padding: 10px;">
+                </div>
+
+                <div class="hoi-footer">
+                    <button type="button" class="btn-hoi-submit" onclick="alert('Sent to HOI for Immediate Review!')">
+                        SUBMIT FOR IMMEDIATE HOI REVIEW
+                    </button>
+                    <button type="button" class="btn-hoi-cancel" onclick="closeHOIModal()">
+                        ← RETURN TO PURCHASE FORM
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="card">
+            
+            <h1 class="main-title">IT INFRASTRUCTURE REPORT</h1>
+
+            <div class="tabs-container">
+                <button class="tab-btn active" onclick="switchTab('Daily')">Daily Activity</button>
+                <button class="tab-btn" onclick="switchTab('Monthly')">Monthly Activity</button>
+            </div>
+
+            <div class="report-header">
+                <h2 id="reportTitle">Daily Status Report</h2>
+            </div>
+
+            <form id="reportForm">
+                
+                <div id="dailySection">
+                    
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-fingerprint"></i> Biometrics & Attendance</div>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Student Biometric Status</label>
+                                <select onchange="toggleReason(this, 'q3_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Working">Not Working</option>
+                                </select>
+                                <input type="text" id="q3_reason" class="reason-input" placeholder="Specify Reason...">
+                            </div>
+                            <div class="form-group">
+                                <label>Hostel Biometric Status</label>
+                                <select onchange="toggleReason(this, 'q8_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Working">Not Working</option>
+                                </select>
+                                <input type="text" id="q8_reason" class="reason-input" placeholder="Specify Reason...">
+                            </div>
+                            <div class="form-group">
+                                <label>Employee Biometric Status</label>
+                                <select onchange="toggleReason(this, 'q12_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Working">Not Working</option>
+                                </select>
+                                <input type="text" id="q12_reason" class="reason-input" placeholder="Specify Reason...">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 15px;">
+                            <label style="font-size:14px; color:#666; font-weight:bold; margin-bottom:15px; display:block;">Biometric Counts</label>
+                            <div class="grid-4">
+                                <div class="form-group"><label>AHS Count</label><input type="number" placeholder="0"></div>
+                                <div class="form-group"><label>Pharmacy Count</label><input type="number" placeholder="0"></div>
+                                <div class="form-group"><label>Nursing Count</label><input type="number" placeholder="0"></div>
+                                <div class="form-group"><label>Engineering Count</label><input type="number" placeholder="0"></div>
+                                <div class="form-group"><label>Boys Hostel Count</label><input type="number" placeholder="0"></div>
+                                <div class="form-group"><label>Girls Hostel Count</label><input type="number" placeholder="0"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-network-wired"></i> Network & Hardware</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Network Working Status</label>
+                                <select onchange="toggleReason(this, 'q14_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Working">Not Working</option>
+                                </select>
+                                <input type="text" id="q14_reason" class="reason-input" placeholder="Specify Network Issue...">
+                            </div>
+                            <div class="form-group">
+                                <label>Printer Issue Status</label>
+                                <select onchange="toggleReason(this, 'q16_reason')">
+                                    <option value="No Issues">No Issues</option>
+                                    <option value="Issues">Issues</option>
+                                </select>
+                                <input type="text" id="q16_reason" class="reason-input" placeholder="Describe Printer Issue...">
+                            </div>
+                            <div class="form-group">
+                                <label>Photocopy Machine Status</label>
+                                <select onchange="toggleReason(this, 'q18_reason')">
+                                    <option value="No Issues">No Issues</option>
+                                    <option value="Issues">Issues</option>
+                                </select>
+                                <input type="text" id="q18_reason" class="reason-input" placeholder="Describe Machine Issue...">
+                            </div>
+                            <div class="form-group">
+                                <label>CCTV Issue Status</label>
+                                <select onchange="toggleReason(this, 'q20_reason')">
+                                    <option value="No Issues">No Issues</option>
+                                    <option value="Issues">Issues</option>
+                                </select>
+                                <input type="text" id="q20_reason" class="reason-input" placeholder="Describe CCTV Issue...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-wifi"></i> Internet Bandwidth Deviation</div>
+                        <div class="grid-3">
+                            <div class="form-group"><label>Airtel Line</label><input type="text" placeholder="e.g. Stable / 50Mbps"></div>
+                            <div class="form-group"><label>Jio Line</label><input type="text" placeholder="e.g. Stable / 100Mbps"></div>
+                            <div class="form-group"><label>SP Internet</label><input type="text" placeholder="e.g. Stable"></div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-bullhorn"></i> Events & Signage</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Event Support (Audio/System)</label>
+                                <select><option>Completed</option><option>Not Applicable</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Signage</label>
+                                <select onchange="toggleReason(this, 'q26_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                                <input type="text" id="q26_reason" class="reason-input" placeholder="Why Pending?">
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+
+                <div id="monthlySection" class="hidden">
+                    
+                    <div class="section-box" style="border-left: 4px solid orange;">
+                        <div class="section-header" style="color: chocolate;">
+                            <i class="fas fa-file-invoice-dollar"></i> Payments & Licenses
+                        </div>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Internet Payment Status</label>
+                                <select onchange="toggleReason(this, 'q28_reason')">
+                                    <option value="Paid">Paid</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not Paid">Not Paid</option>
+                                </select>
+                                <input type="text" id="q28_reason" class="reason-input" placeholder="Payment Details...">
+                            </div>
+                            <div class="form-group">
+                                <label>Software Installation</label>
+                                <select onchange="toggleReason(this, 'q30_reason')">
+                                    <option value="Installed">Installed</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                                <input type="text" id="q30_reason" class="reason-input" placeholder="Specify Pending Software...">
+                            </div>
+                            <div class="form-group">
+                                <label>Software License Status</label>
+                                <select>
+                                    <option value="Active">Active</option>
+                                    <option value="Expired">Expired</option>
+                                    <option value="Renewal Due">Renewal Due</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-box" style="border-left: 4px solid #2563eb;">
+                        <div class="section-header" style="color: #2563eb;">
+                            <i class="fas fa-tools"></i> Monthly Maintenance
+                        </div>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label>Laptop Maintenance</label>
+                                <select onchange="toggleReason(this, 'q32_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                                <input type="text" id="q32_reason" class="reason-input" placeholder="Why Pending?">
+                            </div>
+                            <div class="form-group">
+                                <label>VOIP Status</label>
+                                <select onchange="toggleReason(this, 'q34_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Working">Not Working</option>
+                                    <option value="Partial">Partial</option>
+                                </select>
+                                <input type="text" id="q34_reason" class="reason-input" placeholder="Specify VOIP Issue...">
+                            </div>
+                            <div class="form-group">
+                                <label>CCTV Blind Spots</label>
+                                <select onchange="toggleReason(this, 'q38_reason')">
+                                    <option value="Fixed">Fixed</option>
+                                    <option value="Not Fixed">Not Fixed</option>
+                                </select>
+                                <input type="text" id="q38_reason" class="reason-input" placeholder="Why Not Fixed?">
+                            </div>
+                            <div class="form-group">
+                                <label>Wireless Dongle Status</label>
+                                <select onchange="toggleReason(this, 'q40_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Working">Not Working</option>
+                                </select>
+                                <input type="text" id="q40_reason" class="reason-input" placeholder="Reason...">
+                            </div>
+                            <div class="form-group">
+                                <label>Amplifier Speaker Maint</label>
+                                <select onchange="toggleReason(this, 'q50_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not Completed">Not Completed</option>
+                                </select>
+                                <input type="text" id="q50_reason" class="reason-input" placeholder="Reason...">
+                            </div>
+                            <div class="form-group">
+                                <label>Podium Mic Maint</label>
+                                <select onchange="toggleReason(this, 'q52_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not Completed">Not Completed</option>
+                                </select>
+                                <input type="text" id="q52_reason" class="reason-input" placeholder="Reason...">
+                            </div>
+                             <div class="form-group">
+                                <label>CCTV Maintenance</label>
+                                <select onchange="toggleReason(this, 'q54_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not Completed">Not Completed</option>
+                                </select>
+                                <input type="text" id="q54_reason" class="reason-input" placeholder="Reason...">
+                            </div>
+                             <div class="form-group">
+                                <label>Computer Service Maint</label>
+                                <select onchange="toggleReason(this, 'q56_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not Completed">Not Completed</option>
+                                </select>
+                                <input type="text" id="q56_reason" class="reason-input" placeholder="Reason...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-shopping-cart"></i> New Purchases</div>
+                         <div class="grid-2">
+                            <div class="form-group">
+                                <label>New Purchases List</label>
+                                <select onchange="toggleReason(this, 'q36_section')">
+                                    <option value="No">No</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="Planned">Planned</option>
+                                </select>
+                                <div id="q36_section" class="reason-input" style="color: #333; background: #f0fdf4; border-color: #86efac !important;">
+                                    <label>Upload/Details</label>
+                                    <input type="text" placeholder="Enter details or Link...">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Computer Purchase</label>
+                                <select onchange="toggleReason(this, 'q42_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not completed">Not completed</option>
+                                </select>
+                                <input type="text" id="q42_reason" class="reason-input" placeholder="If Pending...">
+                            </div>
+                            <div class="form-group">
+                                <label>Printer Purchase</label>
+                                <select onchange="toggleReason(this, 'q44_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not completed">Not completed</option>
+                                </select>
+                                <input type="text" id="q44_reason" class="reason-input" placeholder="If Pending...">
+                            </div>
+                            <div class="form-group">
+                                <label>Accessories Purchase</label>
+                                <select onchange="toggleReason(this, 'q46_reason')">
+                                    <option value="Completed">Completed</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Not completed">Not completed</option>
+                                </select>
+                                <input type="text" id="q46_reason" class="reason-input" placeholder="If Pending...">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-box">
+                        <div class="section-header"><i class="fas fa-tasks"></i> Inventory & Status Checks</div>
+                        <div class="grid-3">
+                             <div class="form-group">
+                                <label>Stock Maintenance</label>
+                                <select onchange="toggleReason(this, 'q48_reason')">
+                                    <option value="Updated">Updated</option>
+                                    <option value="Not Updated">Not Updated</option>
+                                </select>
+                                <input type="text" id="q48_reason" class="reason-input" placeholder="Why Not Updated?">
+                            </div>
+                            <div class="form-group">
+                                <label>Network Status</label>
+                                <select onchange="toggleReason(this, 'q58_reason')">
+                                    <option value="Good">Good</option>
+                                    <option value="Issues">Issues</option>
+                                    <option value="Down">Down</option>
+                                </select>
+                                <input type="text" id="q58_reason" class="reason-input" placeholder="Specify Issues...">
+                            </div>
+                            <div class="form-group">
+                                <label>Server Status</label>
+                                <select>
+                                    <option value="Running">Running</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Down">Down</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Data Status</label>
+                                <select onchange="toggleReason(this, 'q61_reason')">
+                                    <option value="Secured">Secured</option>
+                                    <option value="Updated">Updated</option>
+                                    <option value="Issued">Issued</option>
+                                </select>
+                                <input type="text" id="q61_reason" class="reason-input" placeholder="Specify Issues...">
+                            </div>
+                            <div class="form-group">
+                                <label>Biometric Device</label>
+                                <select onchange="toggleReason(this, 'q63_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Working">Not Working</option>
+                                    <option value="Issues">Issues</option>
+                                </select>
+                                <input type="text" id="q63_reason" class="reason-input" placeholder="Specify Issues...">
+                            </div>
+                            <div class="form-group">
+                                <label>CUG Mobile Numbers</label>
+                                <select onchange="toggleReason(this, 'q65_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Used">Not Used</option>
+                                    <option value="Issues">Issues</option>
+                                </select>
+                                <input type="text" id="q65_reason" class="reason-input" placeholder="Specify Issues...">
+                            </div>
+                            <div class="form-group">
+                                <label>Projector & Screen</label>
+                                <select onchange="toggleReason(this, 'q67_reason')">
+                                    <option value="Working">Working</option>
+                                    <option value="Not Used">Not Used</option>
+                                    <option value="Issues">Issues</option>
+                                </select>
+                                <input type="text" id="q67_reason" class="reason-input" placeholder="Specify Issues...">
+                            </div>
+                            <div class="form-group">
+                                <label>Electronics Waste</label>
+                                <select>
+                                    <option value="Managed">Managed</option>
+                                    <option value="Not Managed">Not Managed</option>
+                                    <option value="Need Pickup">Need Pickup</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-box" style="border-left: 4px solid crimson; margin-top: 30px;">
+                    <div class="section-header" style="color: crimson;">
+                        <i class="fas fa-exclamation-triangle"></i> Issues & Support (Common)
+                    </div>
+                    
+                    <div class="grid-2">
+                        <div>
+                            <label style="font-weight:bold; margin-bottom:10px; display:block; color:#333;">Issues Faced (Check all that apply):</label>
+                            <div class="checkbox-group"><input type="checkbox"> <span>Biometric failure / mismatch</span></div>
+                            <div class="checkbox-group"><input type="checkbox"> <span>Network outage / latency</span></div>
+                            <div class="checkbox-group"><input type="checkbox"> <span>Printer hardware/software error</span></div>
+                            <div class="checkbox-group"><input type="checkbox"> <span>CCTV recording/stream issues</span></div>
+                        </div>
+                        <div>
+                            <label style="font-weight:bold; margin-bottom:10px; display:block; color:#333;">&nbsp;</label>
+                            <div class="checkbox-group"><input type="checkbox"> <span>Purchase delay</span></div>
+                            <div class="checkbox-group"><input type="checkbox"> <span>Inventory mismatch</span></div>
+                            <div class="checkbox-group"><input type="checkbox"> <span>License expiry / compliance</span></div>
+                            <div class="checkbox-group"><input type="checkbox"> <span>No issues</span></div>
+                        </div>
+                    </div>
+                    
+                    <hr style="border-top: 1px dashed #ccc; margin: 20px 0;">
+
+                    <div class="grid-2">
+                        <div class="form-group" id="q72_section" style="display:none;">
+                            <label>Specify support needed</label>
+                            <textarea rows="2" placeholder="Describe the support needed..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="button" class="btn-submit" onclick="alert('Report Submitted Successfully!')">Submit Report</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // HOI Modal Logic
+        function openHOIModal() {
+            document.getElementById('hoiModal').style.display = 'flex';
+        }
+
+        function closeHOIModal() {
+            document.getElementById('hoiModal').style.display = 'none';
+        }
+
+        // Close modal if clicked outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('hoiModal');
+            if (event.target == modal) {
+                closeHOIModal();
+            }
+        }
+
+        // Tab Switching Logic
+        function switchTab(frequency) {
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const titleElement = document.getElementById('reportTitle');
+            const dailySec = document.getElementById('dailySection');
+            const monthlySec = document.getElementById('monthlySection');
+
+            if (frequency === 'Daily') {
+                titleElement.innerText = 'Daily Status Report';
+                dailySec.classList.remove('hidden');
+                monthlySec.classList.add('hidden');
+            } else if (frequency === 'Monthly') {
+                titleElement.innerText = 'Monthly Maintenance Report';
+                dailySec.classList.add('hidden');
+                monthlySec.classList.remove('hidden');
+            }
+        }
+
+        // Conditional Reason Input Logic
+        function toggleReason(selectElement, inputId) {
+            const inputField = document.getElementById(inputId);
+            // Array of values that trigger the text box
+            const triggerValues = [
+                "Not Working", "Issues", "Pending", "Not Paid", "Partial", 
+                "Not Fixed", "Not Completed", "Not completed", "Not Updated", 
+                "Yes", "Issued", "Not Used"
+            ];
+            
+            if (triggerValues.includes(selectElement.value)) {
+                inputField.style.display = "block";
+                inputField.focus();
+            } else {
+                inputField.style.display = "none";
+                inputField.value = ""; // Clear value if hidden
+            }
+        }
+    </script>
+</body>
+</html>

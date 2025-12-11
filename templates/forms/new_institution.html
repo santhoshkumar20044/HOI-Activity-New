@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Institution Report</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary-color: #006d77; /* Teal Blue */
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --danger-color: crimson; 
+            --info-color: #2563eb;
+            --warning-color: #ff9800;
+            --intervention-bg: #ffc107; 
+            --intervention-border: #ff9800;
+            --intervention-text: #3e2723; 
+            --deep-teal-bg: #005A6F; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--deep-teal-bg);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: #ffffff;
+            border-bottom: 4px solid #004d55;
+            padding: 15px 5%; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            flex-wrap: wrap; 
+            gap: 15px;
+        }
+
+        .logo-left { height: 60px; width: auto; object-fit: contain; }
+        .logo-right { height: 80px; width: auto; object-fit: contain; }
+        .header-right-group { display: flex; align-items: center; gap: 15px; }
+
+        .header-buttons { display: flex; align-items: center; gap: 10px; }
+        .intervention-btn {
+            padding: 8px 16px; border-radius: 999px; border: 1px solid var(--intervention-border); background: var(--intervention-bg);
+            color: var(--intervention-text); font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .back-btn {
+            padding: 8px 16px; border-radius: 999px; border: 1px solid #e5e7eb; background: #ffffff; 
+            color: #111827; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;
+        }
+        .back-btn:hover { background-color: #f3f4f6; }
+
+        /* --- MAIN CONTAINER --- */
+        .main-container { display: flex; justify-content: center; padding: 30px 15px; }
+        .card {
+            background: var(--white); width: 100%; max-width: 900px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            padding: 40px; box-sizing: border-box;
+        }
+        
+        #intervention-page { max-width: 700px; padding: 30px; }
+        #intervention-page .main-title { color: #d32f2f; border-bottom: 2px solid #d32f2f; }
+
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 28px; font-weight: 800; text-transform: uppercase;
+            margin-bottom: 25px; border-bottom: 3px solid #e5e7eb; padding-bottom: 15px;
+        }
+        
+        .report-header h2 { margin: 0 0 25px 0; color: #1f2937; font-size: 22px; border-left: 5px solid var(--primary-color); padding-left: 15px; }
+
+        /* --- FORM STRUCTURE --- */
+        .section-box { background: #f9fafb; border: 1px solid #d1d5db; border-radius: 8px; padding: 30px; margin-bottom: 25px; }
+        .section-header { display: flex; align-items: center; gap: 12px; color: var(--primary-color); font-weight: bold; margin-bottom: 25px; font-size: 18px; text-transform: uppercase; }
+        
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 15px; color: #1f2937; }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 14px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(0, 109, 119, 0.15);
+        }
+
+        .radio-group-horizontal { display: flex; flex-direction: row; gap: 25px; padding: 10px 0; align-items: center; }
+        .radio-option { display: flex; align-items: center; gap: 8px; font-size: 15px; color: #374151; }
+        .radio-option input[type="radio"] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--primary-color); }
+
+        .required-label::after { content: " *"; color: var(--danger-color); font-weight: 700; }
+
+        .submit-container { text-align: right; margin-top: 40px; border-top: 1px solid #d1d5db; padding-top: 25px; }
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 16px 50px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
+        .hidden { display: none; }
+
+        /* HOI Buttons */
+        .button-group-hoi { display: flex; justify-content: space-around; gap: 20px; margin-top: 40px; }
+        .submit-btn-hoi { flex-grow: 1; padding: 14px 20px; border: none; border-radius: 6px; font-size: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; color: white; }
+        .submit-btn-hoi.red { background-color: #d32f2f; }
+        .submit-btn-hoi.grey { background-color: #78909c; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; gap: 15px; padding: 20px; }
+            .card { padding: 20px; }
+            .btn-submit { width: 100%; }
+            .button-group-hoi { flex-direction: column; }
+            .grid-2 { display: block; }
+        }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-section"><img src="/public/clg-logo.png" alt="Institution Logo" class="logo-left"></div>
+        <div class="header-right-group">
+            <div class="header-buttons">
+                <button type="button" class="intervention-btn" onclick="toggleInterventionPage(true)">
+                    🚨 HOI Intervention Needed
+                </button>
+                <button type="button" class="back-btn" onclick="history.back()">
+                    ← Back
+                </button>
+            </div>
+            <div class="brand-section"><img src="/public/aakam-logo.png" alt="Aakam 360 Logo" class="logo-right"></div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="institution-page" class="card">
+            
+            <h1 class="main-title">NEW INSTITUTION FORM</h1>
+
+            <div class="report-header">
+                <h2 id="reportTitle">New Institution Status Report</h2>
+            </div>
+
+            <form id="newInstitutionForm" onsubmit="submitNewInstitutionReport(event)">
+                
+                <div id="mainSection">
+                    
+                    <div class="section-box" style="border-left: 4px solid #22c55e;">
+                        <div class="section-header" style="color: #22c55e;"><i class="fas fa-check-double"></i> Status & Frequency</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="q1_frequency" class="required-label">Frequency</label>
+                                <select id="q1_frequency" name="frequency" required>
+                                    <option value="" disabled selected>Select Frequency</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Weekly">Weekly</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="section-box" style="border-left: 4px solid #f97316;">
+                        <div class="section-header" style="color: #f97316;"><i class="fas fa-tasks"></i> Project Milestones</div>
+                        <div class="grid-2">
+                            
+                            <div class="form-group">
+                                <label class="required-label">Planning</label>
+                                <div class="radio-group-horizontal">
+                                    <div class="radio-option"><input type="radio" name="planning" value="Yes" required> <label>Yes</label></div>
+                                    <div class="radio-option"><input type="radio" name="planning" value="No"> <label>No</label></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="required-label">Approval</label>
+                                <div class="radio-group-horizontal">
+                                    <div class="radio-option"><input type="radio" name="approval" value="Yes" required> <label>Yes</label></div>
+                                    <div class="radio-option"><input type="radio" name="approval" value="No"> <label>No</label></div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="required-label">Building Construction / Extension</label>
+                                <div class="radio-group-horizontal">
+                                    <div class="radio-option"><input type="radio" name="building" value="Yes" required> <label>Yes</label></div>
+                                    <div class="radio-option"><input type="radio" name="building" value="No"> <label>No</label></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="required-label">Decisions</label>
+                                <div class="radio-group-horizontal">
+                                    <div class="radio-option"><input type="radio" name="decisions" value="Yes" required> <label>Yes</label></div>
+                                    <div class="radio-option"><input type="radio" name="decisions" value="No"> <label>No</label></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="required-label">Setup</label>
+                                <div class="radio-group-horizontal">
+                                    <div class="radio-option"><input type="radio" name="setup" value="Yes" required> <label>Yes</label></div>
+                                    <div class="radio-option"><input type="radio" name="setup" value="No"> <label>No</label></div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="section-box" style="border-left: 4px solid #ef4444;">
+                        <div class="section-header" style="color: #ef4444;"><i class="fas fa-layer-group"></i> Completion Details</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="q7_status" class="required-label">Status</label>
+                                <select id="q7_status" name="status" required onchange="checkStatusVisibility()">
+                                    <option value="" disabled selected>Select Completion Status</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Partially Complete">Partially Complete</option>
+                                    <option value="Not Completed">Not Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group hidden" id="reason_field" style="margin-top: 20px;">
+                            <label for="q8_reason" class="required-label">Reason for Delay</label>
+                            <textarea id="q8_reason" name="reason" rows="3" placeholder="Enter reason here (e.g., Cash Flow Blockage + Waste observed)..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit" class="btn-submit">Submit Institution Report</button>
+                </div>
+
+            </form>
+        </div>
+        
+        <div id="intervention-page" class="card hidden">
+            <h1 class="main-title"><i class="fas fa-exclamation-triangle"></i> HOI IMMEDIATE INTERVENTION REQUIRED</h1>
+            <p style="text-align:center; margin-bottom:20px; color:#555;">Use this form only for issues requiring <b>immediate</b> Head of Institution (HOI) action</p>
+            
+            <form id="interventionForm">
+                <div class="section-box">
+                    <div class="form-group">
+                        <label for="brief_topic">Brief Topic/Subject</label>
+                        <input type="text" id="brief_topic" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="immediate_action">Immediate Action Required</label>
+                        <textarea id="immediate_action" rows="4" required></textarea>
+                    </div>
+                </div>
+                
+                <div class="button-group-hoi">
+                    <button type="button" class="submit-btn-hoi red" onclick="submitInterventionReport(event)">SUBMIT ALERT</button>
+                    <button type="button" class="submit-btn-hoi grey" onclick="toggleInterventionPage(false)">CANCEL</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const mainFormPage = document.getElementById('institution-page');
+        const interventionPage = document.getElementById('intervention-page');
+        const statusSelect = document.getElementById('q7_status');
+        const reasonField = document.getElementById('reason_field');
+        
+        // --- VISIBILITY LOGIC ---
+        function checkStatusVisibility() {
+            const status = statusSelect.value;
+            if (status === 'Partially Complete' || status === 'Not Completed') {
+                reasonField.classList.remove('hidden');
+                document.getElementById('q8_reason').setAttribute('required', 'required');
+            } else {
+                reasonField.classList.add('hidden');
+                document.getElementById('q8_reason').removeAttribute('required');
+                document.getElementById('q8_reason').value = ''; 
+            }
+        }
+
+        // --- PAGE TOGGLE ---
+        function toggleInterventionPage(showIntervention) {
+            if (showIntervention) {
+                mainFormPage.classList.add('hidden');
+                interventionPage.classList.remove('hidden');
+                window.scrollTo(0, 0); 
+            } else {
+                mainFormPage.classList.remove('hidden');
+                interventionPage.classList.add('hidden');
+            }
+        }
+
+        // --- SUBMIT LOGIC ---
+        async function submitNewInstitutionReport(event) {
+            event.preventDefault();
+            
+            // Helper functions
+            const getVal = (id) => document.getElementById(id).value;
+            const getRadio = (name) => {
+                const el = document.querySelector(`input[name="${name}"]:checked`);
+                return el ? el.value : 'N/A';
+            };
+
+            const freq = getVal('q1_frequency');
+            const planning = getRadio('planning');
+            const approval = getRadio('approval');
+            const building = getRadio('building');
+            const decisions = getRadio('decisions');
+            const setup = getRadio('setup');
+            const status = getVal('q7_status');
+            const reason = getVal('q8_reason');
+
+            // Construct Description
+            let desc = `Freq: ${freq}. `;
+            desc += `Planning: ${planning}, Approval: ${approval}, Building: ${building}, Decisions: ${decisions}, Setup: ${setup}. `;
+            desc += `Status: ${status}`;
+            if(status !== 'Completed' && reason) {
+                desc += ` (Reason: ${reason})`;
+            }
+
+            const payload = {
+                title: "New Institution Report",
+                description: desc,
+                status: 'new',
+                timestamp: new Date()
+            };
+
+            console.log("Submitting:", payload);
+
+            try {
+                const response = await fetch('http://localhost:5000/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("✅ New Institution Report Submitted Successfully!");
+                    window.location.reload(); 
+                } else {
+                    alert("❌ Failed to submit report.");
+                }
+            } catch (error) {
+                console.error(error);
+                alert("❌ Server Error: Is backend running?");
+            }
+        }
+
+        function submitInterventionReport(event) {
+            event.preventDefault();
+            const topic = document.getElementById('brief_topic').value;
+            if(!topic) { alert("Please enter a topic"); return; }
+            
+            alert("🚨 Urgent HOI Intervention Request Sent!");
+            toggleInterventionPage(false);
+        }
+
+        window.onload = function() {
+            mainFormPage.classList.remove('hidden');
+            reasonField.classList.add('hidden');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliations Report Form</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary-color: #006d77; /* Teal Blue */
+            --secondary-color: #eefcfd;
+            --text-dark: #333;
+            --white: #ffffff;
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--primary-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: #ffffff;
+            border-bottom: 4px solid #004d55;
+            padding: 15px 5%; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            flex-wrap: wrap; 
+            gap: 15px;
+        }
+
+        .logo-left { height: 60px; width: auto; object-fit: contain; }
+        .logo-right { height: 80px; width: auto; object-fit: contain; }
+        
+        .header-right-group { display: flex; align-items: center; gap: 15px; }
+        .header-buttons { display: flex; align-items: center; gap: 10px; }
+
+        .intervention-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #ff9800;
+            background: #ffc107;
+            color: #3e2723;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            white-space: nowrap; 
+        }
+        
+        .back-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid #e5e7eb;
+            background: #ffffff;
+            color: #111827;
+            font-size: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .main-container {
+            display: flex;
+            justify-content: center;
+            padding: 30px 15px;
+        }
+
+        .card {
+            background: var(--white);
+            width: 100%;
+            max-width: 1000px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 40px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .main-title {
+            text-align: center; color: var(--primary-color); font-size: 28px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 25px; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px;
+        }
+
+        /* --- FORM GRID SYSTEM --- */
+        .section-box {
+            background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 25px; margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex; align-items: center; gap: 10px; color: var(--primary-color); font-weight: bold; margin-bottom: 20px; font-size: 16px; text-transform: uppercase;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px; color: #374151; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 15px; box-sizing: border-box; transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(0, 109, 119, 0.1);
+        }
+
+        .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #444; }
+        .checkbox-group input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--primary-color); }
+        
+        .radio-group-item { 
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #444; 
+        }
+        .radio-group-item input[type="radio"] { 
+            width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--primary-color);
+        }
+
+        .submit-container { text-align: right; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px; }
+        .btn-submit {
+            background-color: var(--primary-color); color: white; padding: 14px 40px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+        }
+        .btn-submit:active { transform: scale(0.98); }
+        .hidden { display: none; }
+
+        @media (max-width: 768px) {
+            header { flex-direction: column; text-align: center; gap: 15px; padding: 20px; }
+            .grid-2 { grid-template-columns: 1fr; gap: 15px; }
+            .card { padding: 20px; }
+            .btn-submit { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-section"><img src="/public/clg-logo.png" alt="College Logo" class="logo-left" onerror="this.style.display='none'"></div>
+        
+        <div class="header-right-group">
+            <div class="header-buttons">
+                <button type="button" class="back-btn" onclick="history.back()">← Back</button>
+            </div>
+            <div class="brand-section"><img src="/public/aakam-logo.png" alt="Aakam Logo" class="logo-right" onerror="this.style.display='none'"></div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        
+        <div id="affiliations-form-page" class="card">
+            
+            <h1 class="main-title">AFFILIATIONS REPORT</h1>
+
+            <form id="affiliationsForm">
+                
+                <div class="section-box">
+                    <div class="section-header"><i class="fas fa-university"></i> Affiliation Type*</div>
+                    <div class="form-group">
+                        <label>Select affiliation type (Check all that apply)</label>
+                        <div class="grid-2">
+                            <div class="checkbox-group"><input type="checkbox" name="affiliation_type" value="Anna_University"> <span>Anna University</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="affiliation_type" value="AICTE"> <span>AICTE</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="affiliation_type" value="PCI"> <span>PCI</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="affiliation_type" value="MGR_University"> <span>MGR University</span></div>
+                            <div class="checkbox-group"><input type="checkbox" name="affiliation_type" value="INC_TNNMC"> <span>INC/TNNMC</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-header"><i class="fas fa-tasks"></i> Completion & Readiness Status*</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Current status*</label>
+                            <div class="radio-group-item">
+                                <input type="radio" id="status_completed" name="current_status" value="Completed" required>
+                                <label for="status_completed" style="margin-bottom: 0; font-weight: normal;">Completed</label>
+                            </div>
+                            <div class="radio-group-item">
+                                <input type="radio" id="status_in_progress" name="current_status" value="In Progress">
+                                <label for="status_in_progress" style="margin-bottom: 0; font-weight: normal;">In Progress</label>
+                            </div>
+                            <div class="radio-group-item">
+                                <input type="radio" id="status_not_started" name="current_status" value="Not Started">
+                                <label for="status_not_started" style="margin-bottom: 0; font-weight: normal;">Not Started</label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="form-group">
+                                <label>Readiness level*</label>
+                                <div class="radio-group-item">
+                                    <input type="radio" id="ready_fully" name="readiness_level" value="Fully Ready" required>
+                                    <label for="ready_fully" style="margin-bottom: 0; font-weight: normal;">Fully Ready</label>
+                                </div>
+                                <div class="radio-group-item">
+                                    <input type="radio" id="ready_partially" name="readiness_level" value="Partially Ready">
+                                    <label for="ready_partially" style="margin-bottom: 0; font-weight: normal;">Partially Ready</label>
+                                </div>
+                                <div class="radio-group-item">
+                                    <input type="radio" id="ready_not" name="readiness_level" value="Not Ready">
+                                    <label for="ready_not" style="margin-bottom: 0; font-weight: normal;">Not Ready</label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group hidden" id="gap_field" style="margin-top: 10px;">
+                                <label for="main_gap" style="color: #d32f2f;">If not ready, mention the main gap:</label>
+                                <textarea id="main_gap" name="main_gap" rows="2" placeholder="Describe the main gap here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-box">
+                    <div class="section-header"><i class="fas fa-exclamation-triangle"></i> Risk & Support</div>
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Risk Level*</label>
+                            <div class="radio-group-item">
+                                <input type="radio" id="risk_low" name="risk_level" value="Low" checked>
+                                <label for="risk_low" style="margin-bottom: 0; font-weight: normal;">Low</label>
+                            </div>
+                            <div class="radio-group-item">
+                                <input type="radio" id="risk_med" name="risk_level" value="Medium">
+                                <label for="risk_med" style="margin-bottom: 0; font-weight: normal;">Medium</label>
+                            </div>
+                            <div class="radio-group-item">
+                                <input type="radio" id="risk_high" name="risk_level" value="High">
+                                <label for="risk_high">High</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="button" class="btn-submit" onclick="submitAffiliationsReport(event)">Submit Affiliations Report</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Form Interaction Logic ---
+
+        const readinessRadios = document.querySelectorAll('input[name="readiness_level"]');
+        const gapField = document.getElementById('gap_field');
+        const supportRadios = document.querySelectorAll('input[name="support_required"]');
+        const supportDetailsField = document.getElementById('support_details_field');
+        
+        // Toggle Gap Field
+        readinessRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                if (event.target.value === 'Not Ready' || event.target.value === 'Partially Ready') {
+                    gapField.classList.remove('hidden');
+                } else {
+                    gapField.classList.add('hidden');
+                    document.getElementById('main_gap').value = ''; 
+                }
+            });
+        });
+        
+        // Toggle Support Details
+        supportRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                if (event.target.value === 'Yes') {
+                    supportDetailsField.classList.remove('hidden');
+                } else {
+                    supportDetailsField.classList.add('hidden');
+                    document.getElementById('support_details').value = ''; 
+                }
+            });
+        });
+
+        // --- SUBMIT LOGIC ---
+        async function submitAffiliationsReport(event) {
+            event.preventDefault();
+            
+            // Basic Validation
+            if (!document.querySelector('input[name="current_status"]:checked') ||
+                !document.querySelector('input[name="readiness_level"]:checked')) {
+                alert("Please fill out all required fields (*).");
+                return;
+            }
+            
+            // Collect Data
+            const getRadio = (name) => {
+                const el = document.querySelector(`input[name="${name}"]:checked`);
+                return el ? el.value : 'N/A';
+            };
+            
+            const getCheckboxes = (name) => {
+                const checked = document.querySelectorAll(`input[name="${name}"]:checked`);
+                return Array.from(checked).map(cb => cb.value).join(", ");
+            };
+
+            const type = getCheckboxes('affiliation_type') || "None";
+            const status = getRadio('current_status');
+            const readiness = getRadio('readiness_level');
+            const gap = document.getElementById('main_gap').value;
+            const risk = getRadio('risk_level');
+            const support = getRadio('support_required');
+            const supportDetails = document.getElementById('support_details').value;
+
+            // Construct Description
+            let desc = `Type: ${type}. Status: ${status}. Readiness: ${readiness}. `;
+            if(gap) desc += `Gap: ${gap}. `;
+            desc += `Risk: ${risk}. Support: ${support}`;
+            if(support === 'Yes' && supportDetails) desc += ` (${supportDetails})`;
+
+            // Payload
+            const payload = {
+                title: "Affiliations Report",
+                description: desc,
+                status: 'new',
+                timestamp: new Date()
+            };
+
+            try {
+                const response = await fetch('http://localhost:5000/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("✅ Affiliations Report Submitted Successfully!");
+                    window.location.reload();
+                } else {
+                    alert("❌ Failed to submit report.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("❌ Server Error: Is backend running?");
+            }
+        }
+    </script>
+</body>
+</html>

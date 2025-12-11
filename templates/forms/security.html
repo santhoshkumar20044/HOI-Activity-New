@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SECURITY — Activity & Risk Report</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --page-teal:#006d77;
+      --teal-dark:#0b6b6a;
+      --card-bg:#ffffff;
+      --soft-bg:#f3f6f6;
+      --muted:#6b7280;
+      --danger:#d32f2f;
+      --warn:#f59e0b;
+      --card-shadow:0 14px 40px rgba(3,15,15,0.12);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{
+      height:100%;
+      font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+    body{
+      background:var(--page-teal);
+      color:#122;
+    }
+
+    /* HEADER */
+    .topbar{
+      background:#fff;
+      padding:14px 32px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 3px 10px rgba(0,0,0,0.06);
+    }
+    .brand-left{display:flex;align-items:center;gap:12px}
+    .brand-left img{height:56px}
+    .brand-right{display:flex;align-items:center;gap:12px}
+    .pill{
+      background:linear-gradient(180deg,#ffd966,#ffca28);
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:800;
+      color:#5a3f00;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .back-btn{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid #e6eef0;
+      background:#fff;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .logo-right{
+      height:48px;
+      width:auto;
+      object-fit:contain;
+    }
+
+    .badge-risk{
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .badge-low{background:#e0f7fa;color:#006064}
+    .badge-medium{background:#fff3cd;color:#8a6d3b}
+    .badge-high{background:#ffebee;color:#b71c1c}
+
+    /* PAGE + CARD */
+    .page{padding:44px 20px 80px}
+    .card{
+      max-width:980px;
+      margin:0 auto;
+      background:var(--card-bg);
+      border-radius:16px;
+      padding:32px 40px 26px;
+      box-shadow:var(--card-shadow);
+    }
+
+    .title{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-bottom:6px;
+    }
+    .title-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .title-left > div{
+      text-align:center;
+    }
+    .title-left i{
+      width:40px;height:40px;border-radius:50%;
+      background:#e0f2f2;color:var(--teal-dark);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:18px;
+    }
+    .title h1{
+      margin:0;
+      font-size:24px;
+      color:var(--teal-dark);
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+    .subtitle{
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:18px;
+    }
+
+    .section{
+      background:#fbfffe;
+      border-radius:12px;
+      padding:18px;
+      border:1px solid #e6f1f1;
+      margin-bottom:16px;
+    }
+    .heading{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      color:var(--teal-dark);
+      margin-bottom:12px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-size:13px;
+    }
+    .heading i{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:30px;
+      height:30px;
+      border-radius:8px;
+      background:#e8f6f6;
+      color:var(--teal-dark);
+      font-size:14px;
+    }
+
+    .grid{display:grid;gap:14px 16px}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
+
+    label{
+      display:block;
+      font-weight:700;
+      color:#114;
+      margin-bottom:6px;
+      font-size:14px;
+    }
+    .req{color:var(--danger);margin-left:4px}
+    input[type="text"],
+    textarea,
+    select{
+      width:100%;
+      padding:9px 11px;
+      border-radius:10px;
+      border:1px solid #e6eef0;
+      font-size:14px;
+      background:#fff;
+      outline:none;
+      transition:border-color .15s,box-shadow .15s;
+    }
+    input:focus,textarea:focus,select:focus{
+      border-color:var(--teal-dark);
+      box-shadow:0 0 0 2px rgba(0,109,119,0.12);
+    }
+    textarea{min-height:72px;resize:vertical}
+    .hint{font-size:11px;color:var(--muted);margin-top:4px}
+
+    .checkbox-group{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:13px;
+    }
+    .checkbox-row{
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+    }
+    .checkbox-row input{margin-top:3px}
+
+    .inline-options{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 16px;
+      font-size:13px;
+    }
+    .inline-options label{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      font-weight:600;
+      cursor:pointer;
+    }
+
+    .status-strip{
+      margin-top:10px;
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      color:var(--muted);
+      border-top:1px dashed #e5f2f2;
+      padding-top:8px;
+    }
+    .status-left{
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#16a34a;
+    }
+
+    .submit-area{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:18px;
+      border-top:1px dashed #eaf6f6;
+      padding-top:16px;
+      gap:10px;
+    }
+    .btn{
+      padding:10px 18px;
+      border-radius:10px;
+      border:0;
+      font-weight:900;
+      cursor:pointer;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn.primary{background:var(--teal-dark);color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #e6eef0;color:#123}
+    .msg{font-size:12px;margin-top:6px}
+    .msg-ok{color:#15803d}
+    .msg-err{color:var(--danger)}
+
+    /* HOI overlay */
+    .overlay{
+      position:fixed;inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.35);
+      z-index:9999;
+    }
+    .overlay .inner{
+      background:#fff;
+      border-radius:12px;
+      padding:20px;
+      width:520px;
+      max-width:94%;
+      box-shadow:0 30px 80px rgba(0,0,0,0.3);
+    }
+    .overlay h3{
+      margin:0 0 8px;
+      color:var(--danger);
+      font-size:18px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .overlay p{margin:0 0 10px;font-size:13px;color:#555}
+
+    @media(max-width:960px){
+      .card{padding:26px 22px}
+      .grid-2{grid-template-columns:1fr}
+      .topbar{padding:10px 16px}
+      .title h1{font-size:20px}
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-left">
+    <img src="/public/clg-logo.png" alt="College Logo" onerror="this.style.display='none'">
+  </div>
+
+  <div class="brand-right">
+    <div class="pill" id="hoiPill">
+      <i class="fas fa-exclamation-circle" style="color:#bf5d00"></i>
+      HOI Intervention
+    </div>
+    <button class="back-btn" type="button" onclick="history.back()">← Back</button>
+    <img src="/public/aakam-logo.png" alt="Aakam 360 Logo" class="logo-right" onerror="this.style.display='none'">
+  </div>
+</header>
+
+<div class="page">
+  <div class="card">
+    <div class="title">
+      <div class="title-left">
+        <i class="fas fa-user-shield"></i>
+        <div>
+          <h1>SECURITY REPORT</h1>
+          <div class="subtitle">
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form id="securityForm" autocomplete="off" onsubmit="event.preventDefault(); submitSecurity();">
+
+      <!-- SECTION 1: ACTIVITY & FREQUENCY -->
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-list-check"></i> ACTIVITY & FREQUENCY
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label for="frequency">
+              Frequency of this activity <span class="req">*</span>
+            </label>
+            <select id="frequency">
+              <option value="">-- Select --</option>
+              <option>Daily</option>
+             
+            </select>
+            <div class="hint">Mapped from "frequency of this activity *" (Google Form dropdown).</div>
+          </div>
+
+          <div>
+            <label for="visitorIssued">
+              Visitor Pass Issued <span class="req">*</span>
+            </label>
+            <input id="visitorIssued" type="text" placeholder="Number or short note">
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="grid grid-2">
+          <div>
+            <label for="visitorCollected">
+              Visitor Pass Collected <span class="req">*</span>
+            </label>
+            <input id="visitorCollected" type="text" placeholder="Number or short note">
+          </div>
+
+          <div>
+            <label for="dutyChanged">
+              Duty Changed <span class="req">*</span>
+            </label>
+            <input id="dutyChanged" type="text" placeholder="Eg. Yes / No / Count">
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label for="floorCheck">
+            Floor Check <span class="req">*</span>
+          </label>
+          <input id="floorCheck" type="text" placeholder="Eg. Completed / Not completed / Time taken">
+        </div>
+      </div>
+
+      <!-- SECTION 2: COMPLETION STATUS -->
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-circle-check"></i> COMPLETION STATUS
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label for="activityStatus">
+              Status of the activity <span class="req">*</span>
+            </label>
+            <select id="activityStatus">
+              <option value="">-- Select --</option>
+              <option>Completed</option>
+              <option>Partially Completed</option>
+              <option>Not Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <label for="reason">
+            If Partially / Not Completed, mention the reason
+          </label>
+          <textarea id="reason" placeholder="Reason for partial / non-completion"></textarea>
+        </div>
+      </div>
+
+      <!-- SECTION 3: ISSUES & LEAN WASTE -->
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-exclamation-triangle"></i> ISSUES & LEAN WASTE
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label>Issues faced during activity <span class="req">*</span></label>
+            <div class="checkbox-group">
+              <label class="checkbox-row">
+                <input id="iss1" type="checkbox">
+                <span>Delay in duty replacement</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="iss2" type="checkbox">
+                <span>Missing/Incorrect visitor data</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="iss3" type="checkbox">
+                <span>Visitor pass not collected</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="iss4" type="checkbox">
+                <span>Floor not monitored properly</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="iss5" type="checkbox">
+                <span>Staff shortage</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="iss6" type="checkbox">
+                <span>No issues</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label>Type of waste observed <span class="req">*</span></label>
+            <div class="checkbox-group">
+              <label class="checkbox-row">
+                <input id="w1" type="checkbox">
+                <span>Waiting</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="w2" type="checkbox">
+                <span>Rework</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="w3" type="checkbox">
+                <span>Motion</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="w4" type="checkbox">
+                <span>Overprocessing</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="w5" type="checkbox">
+                <span>Defects like incorrect log or pass errors</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="w6" type="checkbox">
+                <span>No waste</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION 4: PERFORMANCE, RISK & SUPPORT -->
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-chart-line"></i> PERFORMANCE & RISK
+        </div>
+
+        <div style="text-align:right;margin-bottom:8px;">
+          
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label>KPI Status <span class="req">*</span></label>
+            <div class="checkbox-group">
+              <label class="checkbox-row">
+                <input id="kpi1" type="checkbox">
+                <span>100% Monitoring Completed</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="kpi2" type="checkbox">
+                <span>Visitor Logs Accurate</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="kpi3" type="checkbox">
+                <span>Duty Change Smooth</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="kpi4" type="checkbox">
+                <span>Deviation Observed</span>
+              </label>
+              <label class="checkbox-row">
+                <input id="kpi5" type="checkbox">
+                <span>Not Achieved</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div id="submitMsg" class="msg"></div>
+      <div class="submit-area">
+        <button type="button" class="btn secondary"
+                onclick="document.getElementById('securityForm').reset(); resetVisuals();">
+          <i class="fas fa-rotate"></i> Clear
+        </button>
+        <button type="submit" class="btn primary">
+          <i class="fas fa-paper-plane"></i> Submit Report
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- HOI OVERLAY -->
+<div id="overlay" class="overlay">
+  <div class="inner">
+    <h3><i class="fas fa-triangle-exclamation"></i> HOI INTERVENTION NOTE</h3>
+    <p>Based on today’s Risk / Support requirement, summarise the issue for HOI.</p>
+
+    <div style="margin-top:8px">
+      <label>Topic</label>
+      <input id="hoi_topic" type="text" placeholder="Eg. Duty replacement / Visitor management / Monitoring deviation">
+    </div>
+
+    <div style="margin-top:10px">
+      <label>Immediate Action Required</label>
+      <textarea id="hoi_details" rows="4"
+        placeholder="Eg. Additional guard, process correction, CCTV review, etc."></textarea>
+    </div>
+
+    <div class="submit-area" style="margin-top:10px;padding-top:12px;">
+      <button class="btn secondary" type="button" onclick="closeIntervention()">Cancel</button>
+      <button class="btn primary" type="button" onclick="submitIntervention()">Save (Mock)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setRiskBadge(level){
+    const badge = document.getElementById('riskBadge');
+    if(!badge) return;
+    badge.classList.remove('badge-low','badge-medium','badge-high');
+    if(level === 'HIGH'){
+      badge.textContent = 'RISK: HIGH';
+      badge.classList.add('badge-high');
+    }else if(level === 'MEDIUM'){
+      badge.textContent = 'RISK: MEDIUM';
+      badge.classList.add('badge-medium');
+    }else{
+      badge.textContent = 'RISK: LOW';
+      badge.classList.add('badge-low');
+    }
+  }
+
+  function resetVisuals(){
+    const submitMsg = document.getElementById('submitMsg');
+    submitMsg.textContent = '';
+    submitMsg.className = 'msg';
+    document.getElementById('statusText').textContent = 'System check: Awaiting input.';
+    document.getElementById('statusDot').style.background = '#16a34a';
+    setRiskBadge('LOW');
+  }
+
+  function openIntervention(){
+    document.getElementById('overlay').style.display='flex';
+    document.getElementById('hoi_topic').focus();
+  }
+  function closeIntervention(){
+    document.getElementById('overlay').style.display='none';
+    document.getElementById('hoi_topic').value='';
+    document.getElementById('hoi_details').value='';
+  }
+
+  function submitIntervention(){
+    const t = document.getElementById('hoi_topic').value.trim();
+    const d = document.getElementById('hoi_details').value.trim();
+    if(!t || !d){
+      alert('Please fill Topic and Immediate Action.');
+      return;
+    }
+    const payload = {
+      topic:t,
+      details:d,
+      priority:'HOI-Immediate',
+      ts:new Date().toISOString()
+    };
+    console.log('HOI payload (mock):', payload);
+    alert('✅ HOI note prepared (mock). See console for JSON.');
+    closeIntervention();
+  }
+
+  function collectChecked(ids){
+    return ids
+      .map(id => {
+        const el = document.getElementById(id);
+        if(el && el.checked){
+          return el.parentElement ? el.parentElement.textContent.trim() : id;
+        }
+        return null;
+      })
+      .filter(Boolean);
+  }
+
+  function submitSecurity(){
+    const submitMsg = document.getElementById('submitMsg');
+    submitMsg.textContent = '';
+    submitMsg.className = 'msg';
+
+    // BASIC / ACTIVITY
+    const frequency = document.getElementById('frequency').value;
+    const visitorIssued = document.getElementById('visitorIssued').value.trim();
+    const visitorCollected = document.getElementById('visitorCollected').value.trim();
+    const dutyChanged = document.getElementById('dutyChanged').value.trim();
+    const floorCheck = document.getElementById('floorCheck').value.trim();
+
+    const activityStatus = document.getElementById('activityStatus').value;
+    const reason = document.getElementById('reason').value.trim();
+
+    const issues = collectChecked(['iss1','iss2','iss3','iss4','iss5','iss6']);
+    const waste = collectChecked(['w1','w2','w3','w4','w5','w6']);
+
+    const kpi = collectChecked(['kpi1','kpi2','kpi3','kpi4','kpi5']);
+    const kpiOther = document.getElementById('kpiOther').value.trim();
+    if(kpiOther){
+      kpi.push('Other: ' + kpiOther);
+    }
+
+    const riskLevel = document.getElementById('riskLevel').value;
+    const supportRadio = document.querySelector('input[name="supportRequired"]:checked');
+    const supportRequired = supportRadio ? supportRadio.value : '';
+    const supportDetails = document.getElementById('supportDetails').value.trim();
+
+    const errors = [];
+
+    if(!frequency){
+      errors.push('Frequency of this activity is required.');
+    }
+    if(!visitorIssued){
+      errors.push('Visitor Pass Issued is required.');
+    }
+    if(!visitorCollected){
+      errors.push('Visitor Pass Collected is required.');
+    }
+    if(!dutyChanged){
+      errors.push('Duty Changed is required.');
+    }
+    if(!floorCheck){
+      errors.push('Floor Check is required.');
+    }
+    if(!activityStatus){
+      errors.push('Status of the activity is required.');
+    }
+    if((activityStatus === 'Partially Completed' || activityStatus === 'Not Completed') && !reason){
+      errors.push('Reason is required for Partially/Not Completed status.');
+    }
+    if(!issues.length){
+      errors.push('Please select at least one issue faced during activity (or "No issues").');
+    }
+    if(!waste.length){
+      errors.push('Please select at least one type of waste observed (or "No waste").');
+    }
+    if(!kpi.length){
+      errors.push('Please select at least one KPI status.');
+    }
+    if(!riskLevel){
+      errors.push('Risk Level is required.');
+    }
+    if(!supportRequired){
+      errors.push('Please select whether support from HOI/Management is needed.');
+    }
+    if(supportRequired === 'Yes' && !supportDetails){
+      errors.push('Please specify the support needed from HOI/Management.');
+    }
+
+    if(errors.length){
+      submitMsg.textContent = errors.join(' ');
+      submitMsg.classList.add('msg-err');
+      document.getElementById('statusText').textContent = 'Please fill the required fields.';
+      document.getElementById('statusDot').style.background = '#dc2626';
+      return;
+    }
+
+    // AUTO RISK LOGIC
+    let autoRisk = riskLevel || 'Low';
+    let high = false;
+    let medium = false;
+
+    if(activityStatus === 'Not Completed') high = true;
+    if(activityStatus === 'Partially Completed') medium = true;
+
+    if(kpi.includes('Not Achieved') || kpi.includes('Deviation Observed')){
+      high = true;
+    }
+
+    if(issues.some(t =>
+      t.toLowerCase().includes('staff shortage') ||
+      t.toLowerCase().includes('not collected') ||
+      t.toLowerCase().includes('not monitored') ||
+      t.toLowerCase().includes('incorrect visitor data')
+    )){
+      high = true;
+    }
+
+    if(waste.some(t => t.toLowerCase().includes('defects'))){
+      high = true;
+    }
+
+    if(riskLevel === 'High') high = true;
+    else if(riskLevel === 'Medium' && !high) medium = true;
+
+    if(high){
+      autoRisk = 'High';
+    }else if(medium){
+      autoRisk = 'Medium';
+    }else{
+      autoRisk = 'Low';
+    }
+
+    if(autoRisk === 'High'){
+      setRiskBadge('HIGH');
+      document.getElementById('statusText').textContent = 'High risk detected – please escalate to HOI.';
+      document.getElementById('statusDot').style.background = '#dc2626';
+    }else if(autoRisk === 'Medium'){
+      setRiskBadge('MEDIUM');
+      document.getElementById('statusText').textContent = 'Medium risk – monitor and plan corrective actions.';
+      document.getElementById('statusDot').style.background = '#f59e0b';
+    }else{
+      setRiskBadge('LOW');
+      document.getElementById('statusText').textContent = 'Low risk – normal operations.';
+      document.getElementById('statusDot').style.background = '#16a34a';
+    }
+
+    const payload = {
+      submitted_at:new Date().toISOString(),
+      form:'SECURITY-full-ui-mock',
+      fields:{
+        frequency_of_activity:frequency,
+        visitor_pass_issued:visitorIssued,
+        visitor_pass_collected:visitorCollected,
+        duty_changed:dutyChanged,
+        floor_check:floorCheck,
+        activity_status:activityStatus,
+        reason:reason,
+        issues_faced_during_activity:issues,
+        waste_observed:waste,
+        kpi_status:kpi,
+        risk_level_selected:riskLevel,
+        risk_level_auto:autoRisk,
+        support_required:supportRequired,
+        support_details:supportDetails
+      }
+    };
+
+    console.log('SECURITY full form payload (mock):', payload);
+    submitMsg.textContent = '✅ Security report prepared (mock). Check console for JSON payload.';
+    submitMsg.classList.add('msg-ok');
+
+    if(autoRisk === 'High' || supportRequired === 'Yes'){
+      openIntervention();
+    }
+  }
+
+  document.getElementById('hoiPill').addEventListener('click', openIntervention);
+  resetVisuals();
+</script>
+
+</body>
+</html>

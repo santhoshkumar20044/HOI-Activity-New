@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Academics Report — Frequency + Status/Issues/KPI</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --page-teal:#006d77;
+      --teal-dark:#0b6b6a;
+      --card-bg:#ffffff;
+      --soft-bg:#f3f6f6;
+      --muted:#6b7280;
+      --danger:#d32f2f;
+      --card-shadow: 0 14px 40px rgba(3,15,15,0.12);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+    body{background:var(--page-teal); color:#122}
+
+    /* header */
+    .topbar{background:#fff;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 3px 10px rgba(0,0,0,0.06)}
+    .brand-left img{height:56px}
+    .brand-right{display:flex;align-items:center;gap:12px}
+    .pill{background:linear-gradient(180deg,#ffd966,#ffca28);padding:8px 14px;border-radius:999px;font-weight:800;color:#5a3f00;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
+    .back-btn{padding:8px 12px;border-radius:999px;border:1px solid #e6eef0;background:#fff;cursor:pointer}
+
+    /* page */
+    .page{padding:44px 20px 80px}
+    .card{max-width:1100px;margin:0 auto;background:var(--card-bg);border-radius:16px;padding:42px 48px;box-shadow:var(--card-shadow)}
+    .title{text-align:center;margin-bottom:8px}
+    .title h1{margin:0;font-size:32px;color:var(--teal-dark);font-weight:900;letter-spacing:1px;text-transform:uppercase}
+
+    /* tabs */
+    .tabs-wrap{display:flex;justify-content:center;margin:18px 0 22px;flex-wrap:wrap}
+    .tabs{background:var(--soft-bg);padding:6px;border-radius:10px;display:inline-flex;gap:8px;flex-wrap:wrap}
+    .tab-btn{padding:12px 18px;border-radius:8px;border:0;background:transparent;color:var(--muted);font-weight:800;cursor:pointer}
+    .tab-btn.active{background:var(--teal-dark);color:#fff;box-shadow:0 8px 20px rgba(3,15,15,0.12)}
+
+    .report-header{display:flex;align-items:center;gap:12px;margin:18px 0}
+    .report-header h2{margin:0;font-size:20px;font-weight:800;color:#123;padding-left:12px;border-left:6px solid var(--teal-dark)}
+
+    /* sections */
+    .section{background:#fbfffe;border-radius:12px;padding:18px;border:1px solid #e6f1f1;margin-bottom:16px}
+    .heading{display:flex;align-items:center;gap:10px;font-weight:900;color:var(--teal-dark);margin-bottom:12px}
+    .heading i{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#e8f6f6;color:var(--teal-dark)}
+
+    .grid{display:grid;gap:14px}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .grid-4{grid-template-columns:repeat(4,1fr)}
+
+    label{display:block;font-weight:700;color:#114;margin-bottom:8px}
+    input[type="text"], input[type="number"], input[type="time"], select, textarea{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid #e6eef0; font-size:14px; background:#fff;
+    }
+    textarea{min-height:66px; resize:vertical}
+    .checkbox-group{display:flex;flex-direction:column;gap:8px}
+    .checkbox-row{display:flex;align-items:center;gap:8px;font-weight:700;color:#234}
+
+    .subsection { margin-top:14px; border-top:1px dashed #eaf6f6; padding-top:14px; }
+
+    .submit-area{display:flex;justify-content:flex-end;margin-top:16px;border-top:1px dashed #eaf6f6;padding-top:18px;gap:10px}
+    .btn{padding:12px 22px;border-radius:10px;border:0;font-weight:900;cursor:pointer}
+    .btn.primary{background:var(--teal-dark);color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #e6eef0;color:#123}
+
+    /* overlay */
+    .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);z-index:9999}
+    .overlay .inner{background:#fff;border-radius:12px;padding:20px;width:720px;max-width:94%;box-shadow:0 30px 80px rgba(0,0,0,0.3)}
+    .overlay h3{margin:0;color:var(--danger)}
+
+    @media (max-width:960px){
+      .grid-4{grid-template-columns:repeat(2,1fr)}
+      .grid-3{grid-template-columns:repeat(2,1fr)}
+      .card{padding:28px}
+      .tabs {justify-content:center}
+    }
+    @media (max-width:560px){
+      .grid-2,.grid-3,.grid-4{grid-template-columns:1fr}
+      .tab-btn{padding:8px 10px}
+      .title h1{font-size:22px}
+      .topbar{padding:10px}
+    }
+  </style>
+</head>
+<body>
+
+  <script>
+    const SUBMITTER_USER_EMAIL = "{{ session.get('user', 'no-reply@hoi.com') }}"; 
+  </script>
+
+  <header class="topbar">
+    <div class="brand-left">
+      <img src="/public/clg-logo.png" alt="College Logo" onerror="this.style.display='none'">
+    </div>
+
+    <div class="brand-right">
+      <div class="pill" id="hoiPill"><i class="fas fa-exclamation-circle" style="color:#bf5d00"></i> HOI Intervention Needed</div>
+      <button class="back-btn" onclick="history.back()">← Back</button>
+      <img src="/public/aakam-logo.png" alt="Aakam 360" style="height:56px" onerror="this.style.display='none'">
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="card">
+
+      <div class="title"><h1>ACADEMICS REPORT</h1></div>
+
+      <div class="tabs-wrap">
+        <div class="tabs" role="tablist" aria-label="Report frequency">
+          <button id="tabDaily" class="tab-btn active" onclick="switchTab('Daily')">Daily</button>
+          <button id="tabWeekly" class="tab-btn" onclick="switchTab('Weekly')">Weekly</button>
+          <button id="tabMonthly" class="tab-btn" onclick="switchTab('Monthly')">Monthly</button>
+          <button id="tabSemester" class="tab-btn" onclick="switchTab('Semester')">Semester</button>
+          <button id="tabHalf" class="tab-btn" onclick="switchTab('Half')">Half-Yearly</button>
+          <button id="tabYearly" class="tab-btn" onclick="switchTab('Yearly')">Yearly</button>
+        </div>
+      </div>
+
+      <div class="report-header">
+        <h2 id="reportTitle">Daily Report</h2>
+      </div>
+
+      <form id="academicsForm" autocomplete="off">
+
+        <div id="panel-Daily" class="panel">
+          <div class="section">
+            <div class="heading"><i class="fas fa-calendar-day"></i> DAILY</div>
+
+            <div class="grid grid-2">
+              <div>
+                <label for="daily_main_scheduled">Classes / Activities Scheduled</label>
+                <input id="daily_main_scheduled" type="number" min="0" placeholder="Count">
+              </div>
+              <div>
+                <label for="daily_main_conducted">Classes / Activities Conducted</label>
+                <input id="daily_main_conducted" type="number" min="0" placeholder="Count">
+              </div>
+            </div>
+
+            <div class="grid grid-2" style="margin-top:12px">
+              <div>
+                <label for="daily_main_attendance">Attendance Count</label>
+                <input id="daily_main_attendance" type="number" min="0" placeholder="Count">
+              </div>
+              <div>
+                <label for="daily_main_clinical">Clinical Posting (Students)</label>
+                <input id="daily_main_clinical" type="number" min="0" placeholder="Count">
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <label for="daily_main_remarks">Remarks / Activities</label>
+              <textarea id="daily_main_remarks" placeholder="Short notes..."></textarea>
+            </div>
+
+            <div class="subsection">
+              <div class="heading"><i class="fas fa-info-circle"></i> STATUS & IMPACT (Daily)</div>
+              <div class="grid grid-2">
+                <div>
+                  <label for="daily_status_activity">Activity Status</label>
+                  <select id="daily_status_activity"><option>Completed</option><option>Partially Completed</option><option>Pending</option></select>
+                </div>
+                <div>
+                  <label for="daily_status_impact">Impact on Academic Quality</label>
+                  <select id="daily_status_impact"><option>No Impact</option><option>Minor</option><option>Moderate</option><option>High (HOI Required)</option></select>
+                </div>
+              </div>
+              <div style="margin-top:12px">
+                <label for="daily_status_reason">If Not Completed - Reason</label>
+                <textarea id="daily_status_reason"></textarea>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <div class="heading"><i class="fas fa-exclamation-triangle"></i> ISSUES & WASTE (Daily)</div>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px">
+                <div>
+                  <label style="font-weight:800;color:#333">Issues Faced</label>
+                  <div class="checkbox-group" style="margin-top:8px">
+                    <label class="checkbox-row"><input id="daily_iss1" type="checkbox" name="daily_issues" value="Faculty shortage"> Faculty shortage</label>
+                    <label class="checkbox-row"><input id="daily_iss2" type="checkbox" name="daily_issues" value="Class not conducted"> Class not conducted</label>
+                    <label class="checkbox-row"><input id="daily_iss3" type="checkbox" name="daily_issues" value="Log book not updated"> Log book not updated</label>
+                    <label class="checkbox-row"><input id="daily_iss4" type="checkbox" name="daily_issues" value="Curriculum delay"> Curriculum delay</label>
+                    <label class="checkbox-row"><input id="daily_iss_none" type="checkbox" name="daily_issues" value="No issues"> No issues</label>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:12px">
+                <label for="daily_issues_other">Other Issues (describe)</label>
+                <textarea id="daily_issues_other"></textarea>
+              </div>
+            </div>
+
+            <div class="subsection">
+              <div class="heading"><i class="fas fa-chart-line"></i> KPI & SUPPORT (Daily)</div>
+              <div class="grid grid-2">
+                <div>
+                  <div class="checkbox-group" style="margin-top:8px">
+                    <label class="checkbox-row"><input id="daily_kpi1" type="checkbox" name="daily_kpi" value="Classes conducted as planned"> Classes conducted as planned</label>
+                    <label class="checkbox-row"><input id="daily_kpi2" type="checkbox" name="daily_kpi" value="Documentation up to date"> Documentation up to date</label>
+                    <label class="checkbox-row"><input id="daily_kpi3" type="checkbox" name="daily_kpi" value="Attendance counts accurate"> Attendance counts accurate</label>
+                    <label class="checkbox-row"><input id="daily_kpi4" type="checkbox" name="daily_kpi" value="Maintenance updated"> Maintenance updated</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div id="panel-Weekly" class="panel" style="display:none">
+          <div class="section">
+            <div class="heading"><i class="fas fa-calendar-week"></i> WEEKLY</div>
+             <div class="grid grid-2">
+              <div>
+                <label for="weekly_main_scheduled">Classes / Activities Scheduled (Weekly)</label>
+                <input id="weekly_main_scheduled" type="number" min="0">
+              </div>
+              <div>
+                <label for="weekly_main_conducted">Classes / Activities Conducted (Weekly)</label>
+                <input id="weekly_main_conducted" type="number" min="0">
+              </div>
+            </div>
+             </div>
+        </div>
+
+        <div id="panel-Monthly" class="panel" style="display:none">
+           <div class="section">
+            <div class="heading"><i class="fas fa-calendar-alt"></i> MONTHLY</div>
+            <div class="grid grid-2">
+              <div><label for="monthly_main_activities">Monthly Activities (summary)</label><textarea id="monthly_main_activities"></textarea></div>
+            </div>
+             </div>
+        </div>
+
+        <div id="panel-Semester" class="panel" style="display:none">
+             <div class="section">
+                <div class="heading"><i class="fas fa-book"></i> SEMESTER</div>
+                <div class="grid grid-3">
+                  <div><label for="sem_main_syllabus_pct">Syllabus Completion (%)</label><input id="sem_main_syllabus_pct" type="number" min="0" max="100"></div>
+                </div>
+                 </div>
+        </div>
+
+        <div id="panel-Half" class="panel" style="display:none">
+             <div class="section">
+                <div class="heading"><i class="fas fa-calendar-check"></i> HALF-YEARLY</div>
+                <div class="grid grid-3">
+                  <div><label for="half_main_result_analysis">Result Analysis (summary)</label><input id="half_main_result_analysis" type="text"></div>
+                </div>
+                 </div>
+        </div>
+
+        <div id="panel-Yearly" class="panel" style="display:none">
+             <div class="section">
+                <div class="heading"><i class="fas fa-calendar"></i> YEARLY</div>
+                <div class="grid grid-3">
+                  <div><label for="year_main_report">Annual Academic Summary</label><textarea id="year_main_report"></textarea></div>
+                </div>
+                 </div>
+        </div>
+
+        <div class="submit-area">
+          <button type="button" class="btn primary" onclick="submitAcademics(event)">Submit Report</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay">
+    <div class="inner">
+      <h3>🚨 HOI IMMEDIATE INTERVENTION REQUIRED</h3>
+      <p>Use only for urgent issues requiring HOI action.</p>
+
+      <div style="margin-top:12px">
+        <label for="hoi_topic">Topic</label>
+        <input id="hoi_topic" type="text">
+      </div>
+
+      <div style="margin-top:12px">
+        <label for="hoi_details">Immediate Action Required</label>
+        <textarea id="hoi_details" rows="5"></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px">
+        <button class="btn secondary" onclick="closeIntervention()">Cancel</button>
+        <button class="btn primary" onclick="submitIntervention()">Submit to HOI</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Tab list
+  const panels = ['Daily','Weekly','Monthly','Semester','Half','Yearly'];
+  function switchTab(name){
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    const btn = document.getElementById('tab' + name);
+    if(btn) btn.classList.add('active');
+
+    const titleMap = {
+      Daily:'Daily Report', Weekly:'Weekly Report', Monthly:'Monthly Report',
+      Semester:'Semester Report', Half:'Half-Yearly Report', Yearly:'Yearly Report'
+    };
+    document.getElementById('reportTitle').textContent = titleMap[name] || name;
+
+    panels.forEach(p => {
+      const el = document.getElementById('panel-' + p);
+      if(el) el.style.display = (p === name) ? 'block' : 'none';
+    });
+
+    window.scrollTo({ top: document.querySelector('.card').offsetTop - 10, behavior: 'smooth' });
+  }
+
+  // HOI overlay handlers
+  function openIntervention(){ document.getElementById('overlay').style.display='flex'; document.getElementById('hoi_topic').focus(); }
+  function closeIntervention(){ document.getElementById('overlay').style.display='none'; document.getElementById('hoi_topic').value=''; document.getElementById('hoi_details').value=''; }
+
+  // 🚨 HOI INTERVENTION SUBMISSION LOGIC (Mock/Placeholder)
+  function submitIntervention(){
+    const topic = document.getElementById('hoi_topic').value.trim();
+    const details = document.getElementById('hoi_details').value.trim();
+    if(!topic || !details){ alert('Please fill Topic and Details.'); return; }
+    
+    // In a real application, you would create a separate submission here.
+    const hoiPayload = {
+      form_type: "HOI_INTERVENTION",
+      form_user: SUBMITTER_USER_EMAIL,
+      subject: `HOI Intervention: ${topic}`,
+      topic: topic,
+      details: details,
+    };
+    
+    // Mocking the submission process
+    console.log("🚀 Sending HOI Intervention to Backend (Mock):", hoiPayload);
+    alert('✅ HOI Intervention submitted (mock). A real call would be made here.');
+    closeIntervention();
+  }
+
+  // Helper function to safely get value from ID
+  const val = id => (document.getElementById(id) ? document.getElementById(id).value : '');
+  
+  // Helper to collect all form data fields from the active panel
+  function getAllFormData() {
+      const formData = {};
+      const formElement = document.getElementById('academicsForm');
+      
+      // Get all input, select, textarea elements within the form
+      const elements = formElement.querySelectorAll('input, select, textarea');
+      
+      elements.forEach(el => {
+          // Only collect data from the currently visible panel
+          if (el.closest('.panel') && el.closest('.panel').style.display === 'none') {
+              return; 
+          }
+          
+          if (el.id) {
+              if (el.type === 'checkbox') {
+                  // Handle Checkboxes (group them by name if needed, but here we use ID for specific items)
+                  if (el.checked) {
+                      formData[el.id] = el.value || true;
+                  }
+              } else if (el.type === 'number') {
+                  // Convert number inputs to actual numbers if they have a value
+                   const numberValue = parseFloat(el.value);
+                   formData[el.id] = isNaN(numberValue) ? el.value : numberValue;
+              } else {
+                  // For text, select, textarea
+                  formData[el.id] = el.value.trim();
+              }
+          }
+      });
+      return formData;
+  }
+
+
+  // 🌟 REAL SUBMISSION LOGIC - MODIFIED FOR /api/submit_form
+  function submitAcademics(event) {
+    if(event) event.preventDefault();
+
+    // 1. Determine currently active tab/frequency
+    const activeBtn = document.querySelector('.tab-btn.active');
+    const frequency = activeBtn ? activeBtn.innerText : 'Unknown';
+    const form_type = 'academics.html'; // Matches the filename used in app.py
+
+    // 2. Collect ALL form data (only visible fields will have meaningful content)
+    const formData = getAllFormData();
+
+    // 3. Construct a title and description based on the active tab for the 'subject' field
+    let title = `Academics - ${frequency} Report`;
+    let description = '';
+
+    // Create a meaningful description for the submission record
+    if (frequency === 'Daily') {
+        const scheduled = formData['daily_main_scheduled'] || 0;
+        const conducted = formData['daily_main_conducted'] || 0;
+        const status = formData['daily_status_activity'] || 'N/A';
+        description = `Scheduled: ${scheduled}, Conducted: ${conducted}. Status: ${status}. Remarks: ${formData['daily_main_remarks'].substring(0, 50)}...`;
+    } else if (frequency === 'Weekly') {
+        const scheduled = formData['weekly_main_scheduled'] || 0;
+        const conducted = formData['weekly_main_conducted'] || 0;
+        description = `Weekly Scheduled: ${scheduled}, Conducted: ${conducted}.`;
+    } else if (frequency === 'Semester') {
+        const syllabus = formData['sem_main_syllabus_pct'] || 0;
+        description = `Syllabus Completion: ${syllabus}%.`;
+    } 
+    // Default or other frequencies use the simple title
+    if (!description) {
+        description = title;
+    }
+
+
+    // 4. Final Payload Construction
+    const payload = {
+        // Required by app.py's /api/submit_form
+        form_type: form_type,
+        form_user: SUBMITTER_USER_EMAIL, // Passed from Flask session
+        subject: title, 
+        
+        // All form data is passed under the root level (app.py expects JSON dump of all data)
+        ...formData, 
+        
+        // Add description to the payload for easy reference if needed
+        submission_description: description
+    };
+
+    console.log("🚀 Sending to Backend:", payload);
+    document.querySelector('.submit-area .btn.primary').disabled = true; // Prevent double submission
+
+    fetch('/api/submit_form', { // Use relative path, assuming Flask is running on the same domain
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.querySelector('.submit-area .btn.primary').disabled = false;
+        if (data.success) {
+            console.log("✅ Success:", data);
+            alert(`✅ ${frequency} Report Submitted Successfully! Submission ID: ${data.id}. Status: Today Activity.`);
+            // Redirect to the Submitter Dashboard for status tracking
+            window.location.href = '/submitter_dashboard'; 
+        } else {
+            console.error('❌ Backend Error:', data);
+            alert(`Submission Failed! Message: ${data.message || 'Check server logs for details.'}`);
+        }
+    })
+    .catch((error) => {
+        document.querySelector('.submit-area .btn.primary').disabled = false;
+        console.error('❌ Network Error:', error);
+        alert("Network Error! Could not connect to the API. Make sure your Flask server is running.");
+    });
+  }
+
+  // initialize default view
+  (function(){ switchTab('Daily'); })();
+
+  // HOI pill click
+  document.getElementById('hoiPill').addEventListener('click', openIntervention);
+</script>
+</body>
+</html>

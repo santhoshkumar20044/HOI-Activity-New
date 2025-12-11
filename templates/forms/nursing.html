@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root{
+      --page-teal:#006d77;
+      --teal-dark:#0b6b6a;
+      --card-bg:#ffffff;
+      --soft-bg:#f3f6f6;
+      --muted:#6b7280;
+      --danger:#d32f2f;
+      --warn:#f59e0b;
+      --card-shadow:0 14px 40px rgba(3,15,15,0.12);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{
+      height:100%;
+      font-family:"Segoe UI",Tahoma,Arial,sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+    body{
+      background:var(--page-teal);
+      color:#122;
+    }
+
+    /* HEADER */
+    .topbar{
+      background:#fff;
+      padding:14px 32px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 3px 10px rgba(0,0,0,0.06);
+    }
+    .brand-left{display:flex;align-items:center;gap:12px}
+    .brand-left img{height:56px}
+    .brand-right{display:flex;align-items:center;gap:12px}
+    .pill{
+      background:linear-gradient(180deg,#ffd966,#ffca28);
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:800;
+      color:#5a3f00;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .back-btn{
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid #e6eef0;
+      background:#fff;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .logo-right{
+      height:48px;
+      width:auto;
+      object-fit:contain;
+    }
+
+    /* PAGE + CARD */
+    .page{padding:44px 20px 80px}
+    .card{
+      max-width:980px;
+      margin:0 auto;
+      background:var(--card-bg);
+      border-radius:16px;
+      padding:32px 40px 26px;
+      box-shadow:var(--card-shadow);
+    }
+
+    .title{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-bottom:6px;
+    }
+    .title-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .title-left > div{ text-align:center; }
+    .title-left i{
+      width:40px;height:40px;border-radius:50%;
+      background:#e0f2f2;color:var(--teal-dark);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:18px;
+    }
+    .title h1{
+      margin:0;
+      font-size:24px;
+      color:var(--teal-dark);
+      font-weight:900;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .section{
+      background:#fbfffe;
+      border-radius:12px;
+      padding:18px;
+      border:1px solid #e6f1f1;
+      margin-bottom:16px;
+    }
+    .heading{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      color:var(--teal-dark);
+      margin-bottom:12px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      font-size:13px;
+    }
+    .heading i{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:30px;
+      height:30px;
+      border-radius:8px;
+      background:#e8f6f6;
+      color:var(--teal-dark);
+      font-size:14px;
+    }
+
+    .grid{display:grid;gap:14px 16px}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
+
+    label{
+      display:block;
+      font-weight:700;
+      color:#114;
+      margin-bottom:6px;
+      font-size:14px;
+    }
+    .req{color:var(--danger);margin-left:4px}
+    input[type="text"],
+    textarea,
+    select{
+      width:100%;
+      padding:9px 11px;
+      border-radius:10px;
+      border:1px solid #e6eef0;
+      font-size:14px;
+      background:#fff;
+      outline:none;
+      transition:border-color .15s,box-shadow .15s;
+    }
+    input:focus,textarea:focus,select:focus{
+      border-color:var(--teal-dark);
+      box-shadow:0 0 0 2px rgba(0,109,119,0.12);
+    }
+    textarea{min-height:72px;resize:vertical}
+    
+    .hint{font-size:11px;color:var(--muted);margin-top:4px; font-style: italic;}
+
+    .checkbox-group{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:13px;
+    }
+    .checkbox-row{
+      display:flex;
+      align-items:flex-start;
+      gap:8px;
+    }
+    .checkbox-row input{margin-top:3px}
+
+    .submit-area{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:18px;
+      border-top:1px dashed #eaf6f6;
+      padding-top:16px;
+      gap:10px;
+    }
+    .btn{
+      padding:10px 18px;
+      border-radius:10px;
+      border:0;
+      font-weight:900;
+      cursor:pointer;
+      font-size:13px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn.primary{background:var(--teal-dark);color:#fff}
+    .btn.secondary{background:#fff;border:1px solid #e6eef0;color:#123}
+    .msg{font-size:12px;margin-top:6px}
+    .msg-ok{color:#15803d}
+    .msg-err{color:var(--danger)}
+
+    /* NEW CLASS FOR HIDING ELEMENTS */
+    .hidden {
+        display: none !important;
+    }
+
+    /* HOI overlay */
+    .overlay{
+      position:fixed;inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background:rgba(0,0,0,0.35);
+      z-index:9999;
+    }
+    .overlay .inner{
+      background:#fff;
+      border-radius:12px;
+      padding:20px;
+      width:520px;
+      max-width:94%;
+      box-shadow:0 30px 80px rgba(0,0,0,0.3);
+    }
+    .overlay h3{
+      margin:0 0 8px;
+      color:var(--danger);
+      font-size:18px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .overlay p{margin:0 0 10px;font-size:13px;color:#555}
+
+    @media(max-width:960px){
+      .card{padding:26px 22px}
+      .grid-2{grid-template-columns:1fr}
+      .topbar{padding:10px 16px}
+      .title h1{font-size:20px}
+    }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand-left">
+    <img src="/public/college logos/nursing-logo.svg" alt="College Logo" onerror="this.style.display='none'">
+  </div>
+
+  <div class="brand-right">
+    <div class="pill" id="hoiPill">
+      <i class="fas fa-exclamation-circle" style="color:#bf5d00"></i>
+      HOI Intervention
+    </div>
+    <button class="back-btn" type="button" onclick="history.back()">← Back</button>
+    <img src="/public/aakam-logo.png" alt="Aakam 360 Logo" class="logo-right" onerror="this.style.display='none'">
+  </div>
+</header>
+
+<div class="page">
+  <div class="card">
+    <div class="title">
+      <div class="title-left">
+        <i class="fas fa-clipboard-list"></i>
+        <div>
+          <h1>NURSING REPORT</h1>
+        </div>
+      </div>
+    </div>
+
+    <form id="nursingForm" autocomplete="off" onsubmit="event.preventDefault(); submitNursing();">
+
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-user-check"></i> BASIC READINESS & ADMIN
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label for="attendance">Attendance (Biometric) <span class="req">*</span></label>
+            <input id="attendance" type="text" placeholder="e.g. 95% or 45/50">
+          </div>
+
+          <div>
+             <label for="clinical">Clinical Posting</label>
+             <input id="clinical" type="text" placeholder="Eg. 2nd Year @ GH, 3rd Year @ Community">
+          </div>
+        </div>
+        
+        <div class="grid grid-2" style="margin-top:14px">
+          <div>
+            <label for="events">Events Planned (Tomorrow)</label>
+            <input id="events" type="text" placeholder="Short answer text">
+          </div>
+
+          <div>
+            <label for="comm">Official Communication</label>
+            <input id="comm" type="text" placeholder="Any updates?">
+            <div class="hint">Includes University, DME, INC, TNNMC correspondence</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="grid grid-2">
+          <div>
+            <label for="complaints">Student Complaints</label>
+            <input id="complaints" type="text" placeholder="Short answer text">
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="grid grid-2">
+            <div>
+                <label for="ro">RO Water Availability</label>
+                <select id="ro">
+                    <option value="Available">Available</option>
+                    <option value="Not Available">Not Available</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+            </div>
+    
+            <div>
+                <label for="bore">Bore Water Availability</label>
+                <select id="bore">
+                    <option value="Available">Available</option>
+                    <option value="Not Available">Not Available</option>
+                    <option value="Maintenance">Maintenance</option>
+                </select>
+            </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-circle-check"></i> COMPLETION & IMPACT
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label for="activityStatus">Activity Status <span class="req">*</span></label>
+            <select id="activityStatus" onchange="toggleReason()">
+              <option value="">-- Select --</option>
+              <option value="Completed">Completed</option>
+              <option value="Partially Completed">Partially Completed</option>
+              <option value="Not Completed">Not Completed</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="impactLevel">Impact Level</label>
+            <select id="impactLevel">
+              <option value="">-- Select --</option>
+              <option>No Impact</option>
+              <option>Minor Impact</option>
+              <option>Moderate Impact</option>
+              <option>High Impact</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="reasonBox" style="margin-top:14px" class="hidden">
+          <label for="reason">Reason (if not completed) <span class="req">*</span></label>
+          <textarea id="reason" placeholder="Please describe the issues, complaints, or disruptions..."></textarea>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-exclamation-triangle"></i> ISSUES & WASTE
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label>Issues Faced Today</label>
+            <div class="checkbox-group">
+              <label class="checkbox-row"><input id="iss1" type="checkbox"> <span>Biometric failure / attendance mismatch</span></label>
+              <label class="checkbox-row"><input id="iss2" type="checkbox"> <span>Student complaints pending</span></label>
+              <label class="checkbox-row"><input id="iss3" type="checkbox"> <span>Event planning incomplete</span></label>
+              <label class="checkbox-row"><input id="iss4" type="checkbox"> <span>RO water unavailable</span></label>
+              <label class="checkbox-row"><input id="iss5" type="checkbox"> <span>Bore water unavailable</span></label>
+              <label class="checkbox-row"><input id="iss6" type="checkbox"> <span>Hygiene / safety concern</span></label>
+              <label class="checkbox-row"><input id="iss7" type="checkbox"> <span>No issues</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="heading">
+          <i class="fas fa-chart-line"></i> KPI & RISK
+        </div>
+
+        <div class="grid grid-2">
+          <div>
+            <label>KPI Achieved</label>
+            <div class="checkbox-group">
+              <label class="checkbox-row"><input id="kpi1" type="checkbox"> <span>Attendance accurate</span></label>
+              <label class="checkbox-row"><input id="kpi2" type="checkbox"> <span>Complaints resolved</span></label>
+              <label class="checkbox-row"><input id="kpi3" type="checkbox"> <span>Event plan ready</span></label>
+              <label class="checkbox-row"><input id="kpi4" type="checkbox"> <span>Water supply stable</span></label>
+              <label class="checkbox-row"><input id="kpi5" type="checkbox"> <span>KPI not achieved</span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="submitMsg" class="msg"></div>
+      <div class="submit-area">
+        <button type="button" class="btn secondary" onclick="document.getElementById('nursingForm').reset(); resetVisuals();">
+          <i class="fas fa-rotate"></i> Clear
+        </button>
+        <button type="submit" class="btn primary">
+          <i class="fas fa-paper-plane"></i> Submit Report
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="overlay" class="overlay">
+  <div class="inner">
+    <h3><i class="fas fa-triangle-exclamation"></i> HOI INTERVENTION NOTE</h3>
+    <p>Based on today’s Risk / Support requirement, summarise the issue for HOI.</p>
+
+    <div style="margin-top:8px">
+      <label>Topic</label>
+      <input id="hoi_topic" type="text" placeholder="Eg. Water issue / Attendance / Safety">
+    </div>
+
+    <div style="margin-top:10px">
+      <label>Immediate Action Required</label>
+      <textarea id="hoi_details" rows="4" placeholder="Eg. Arrange RO repair, resolve biometric issue..."></textarea>
+    </div>
+
+    <div class="submit-area" style="margin-top:10px;padding-top:12px;">
+      <button class="btn secondary" type="button" onclick="closeIntervention()">Cancel</button>
+      <button class="btn primary" type="button" onclick="submitIntervention()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // FUNCTION TO TOGGLE REASON BOX
+  function toggleReason() {
+    const status = document.getElementById('activityStatus').value;
+    const reasonBox = document.getElementById('reasonBox');
+    
+    if (status === 'Partially Completed' || status === 'Not Completed') {
+        reasonBox.classList.remove('hidden');
+    } else {
+        reasonBox.classList.add('hidden');
+        document.getElementById('reason').value = ''; // Clear text if hidden
+    }
+  }
+
+  function resetVisuals(){
+    const submitMsg = document.getElementById('submitMsg');
+    if(submitMsg) {
+        submitMsg.textContent = '';
+        submitMsg.className = 'msg';
+    }
+    toggleReason(); // Reset the reason box visibility
+  }
+
+  function openIntervention(){
+    document.getElementById('overlay').style.display='flex';
+    document.getElementById('hoi_topic').focus();
+  }
+  function closeIntervention(){
+    document.getElementById('overlay').style.display='none';
+    document.getElementById('hoi_topic').value='';
+    document.getElementById('hoi_details').value='';
+  }
+
+  function submitIntervention(){
+    const t = document.getElementById('hoi_topic').value.trim();
+    const d = document.getElementById('hoi_details').value.trim();
+    if(!t || !d){
+      alert('Please fill Topic and Immediate Action.');
+      return;
+    }
+    alert('✅ HOI note submitted!');
+    closeIntervention();
+  }
+
+  function collectChecked(ids){
+    return ids.map(id => {
+        const el = document.getElementById(id);
+        return (el && el.checked) ? el.parentElement.textContent.trim() : null;
+      }).filter(Boolean).join(", ");
+  }
+
+  async function submitNursing(){
+    const submitMsg = document.getElementById('submitMsg');
+    submitMsg.textContent = '';
+    submitMsg.className = 'msg';
+
+    const attendance = document.getElementById('attendance').value.trim();
+    const clinical = document.getElementById('clinical').value.trim();
+    const events = document.getElementById('events').value.trim();
+    const comm = document.getElementById('comm').value.trim();
+    
+    const complaints = document.getElementById('complaints').value.trim();
+    const ro = document.getElementById('ro').value;
+    const bore = document.getElementById('bore').value;
+
+    const activityStatus = document.getElementById('activityStatus').value;
+    const impactLevel = document.getElementById('impactLevel').value;
+    const reason = document.getElementById('reason').value.trim();
+
+    // Check required fields
+    if(!attendance || !activityStatus){
+      alert("Please fill required fields: Attendance and Status.");
+      return;
+    }
+
+    // Validation: If status is incomplete, Reason is mandatory
+    if((activityStatus === 'Partially Completed' || activityStatus === 'Not Completed') && !reason){
+        alert("⚠️ Please provide a Reason for incomplete activity.");
+        return;
+    }
+
+    const issues = collectChecked(['iss1','iss2','iss3','iss4','iss5','iss6','iss7']);
+    const kpi = collectChecked(['kpi1','kpi2','kpi3','kpi4','kpi5']);
+
+    // Construct Description
+    let description = `Attendance: ${attendance}. `;
+    description += `Clinical: ${clinical || 'N/A'}. `;
+    description += `Events: ${events || 'N/A'}. `;
+    description += `Comm(Uni/DME/INC): ${comm || 'None'}. `;
+    description += `Complaints: ${complaints || 'None'}. `;
+    description += `Water (RO/Bore): ${ro} / ${bore}. `;
+    
+    description += `Status: ${activityStatus}. Impact: ${impactLevel}. `;
+    if(reason) description += `Reason: ${reason}. `;
+    
+    if(issues) description += `Issues: ${issues}. `;
+    if(kpi) description += `KPI: ${kpi}. `;
+
+    const payload = {
+      title: "Nursing Report",
+      description: description,
+      status: "new",
+      timestamp: new Date()
+    };
+
+    console.log('Sending to backend:', payload);
+
+    try {
+        const response = await fetch('http://localhost:5000/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert('✅ Nursing Report Submitted Successfully!');
+            window.location.reload();
+        } else {
+            alert('❌ Failed to submit report.');
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert('❌ Server Error: Is backend running?');
+    }
+  }
+
+  document.getElementById('hoiPill').addEventListener('click', openIntervention);
+</script>
+
+</body>
+</html>
